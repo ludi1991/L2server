@@ -1,0 +1,1 @@
+Entry{enemyid=3,id = 1,name = "enemy",major = 0,level = 10,exp = 500}
