@@ -654,6 +654,15 @@ function REQUEST:get_quick_pass_used_time()
     return { times = time }
 end
 
+function REQUEST:set_sculpture()
+    self.basic.player.sculpture = self.sculpture
+    return { result = 1}
+end
+
+function REQUEST:set_nickname()
+    self.basic.player.nickname = self.nickname
+    return { result = 1}
+end
 
 --落地数据到数据库
 local function save_to_db()

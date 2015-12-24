@@ -42,6 +42,7 @@ function itemmgr:add_item_by_object(item)
 end
 
 function itemmgr:add_item(itemtype,count)	
+    count = count or 1
 	local items = self.items
     if self:can_stack(itemtype) then
         if items[itemtype] == nil then

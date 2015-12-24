@@ -692,7 +692,23 @@ get_quick_pass_used_time 61 {
     }
 }
 
+set_sculpture 70 {
+    request {
+        sculpture 0 : integer
+    }
+    response {
+        result 0 : integer
+    }
+}
 
+set_nickname 71 {
+    request {
+        nickname 0 : string
+    }
+    response {
+        result 0 : integer
+    }
+}
 
 
 ]]

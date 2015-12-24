@@ -16,6 +16,7 @@ end
 local ROBOT_NEED = 1000
 local npcgen = require "gamelogic.generateNPC.npcgen"
 local fp_cal = require "gamelogic.fp_calculator"
+local namegen = require "gamelogic.name_generator.namegen"
 
 
 
@@ -24,7 +25,7 @@ local function gen_robots(count)
         local level = math.floor((1000-i+1)/25+5)
         local factor = 0.8-0.8*i/1000
        -- local factor = 0.8
-        robot_data[1000000+i] = npcgen:GenerateNpc(level,factor,1000000+i,"robot"..i)
+        robot_data[1000000+i] = npcgen:GenerateNpc(level,factor,1000000+i,namegen:GenerateName(math.random(1,2) == 1))
 
         local count = #robot_data[1000000+i].souls
         robot_data[1000000+i].config.soulid_1v1 = math.random(count)
@@ -109,7 +110,7 @@ function command.CREATE_PLAYER(nickname)
 
     player.basic = {
         playerid = newplayerid,
-        nickname = nickname..newplayerid,
+        nickname = namegen:GenerateName(math.random(1,2) == 1),
         diamond = 0,
         gold = 0,
         create_time = os.date("%Y-%m-%d %X"),

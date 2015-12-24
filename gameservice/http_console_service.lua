@@ -38,9 +38,15 @@ function command.GET_ARENA_DATA(arena_type)
 end
 
 function command.DAILY_UPDATE()
-    log("heihei")
     local count = skynet.call("UPDATE_SERVICE","lua","update")
     return "ok ".. count .."player is updated"
+end
+
+function command.KICK_PLAYER(playerid)
+end
+
+function command.SHUTDOWN()
+    local res = skynet.call("ONLINE_CENTER","lua","send_to_online_players","kick")
 end
 
 

@@ -247,7 +247,7 @@ function NpcGen:GenerateMisc(level, playerid, nickname, create_time, last_login_
 	-- set misc data
 	local basic = {["playerid"] = playerid, 		["level"] = level, 		["nickname"] = nickname,
 						["create_time"] = create_time, 		["cur_stayin_level"] = 1, 		["last_login_time"] = last_login_time,
-							["diamond"] = 0, 		["cursoul"] = maxSouls, 		["gold"] = gold}
+							["diamond"] = 0, 		["cursoul"] = maxSouls, 		["gold"] = gold , ["head_sculpture"] = math.random(1,10)}
 
 	local lab = { 		["be_helped_list"] = { 		}, 		["help_list"] = { 		}, 		["keys"] = 5, 		["hourglass"] = { 		}, 		["keeper"] = 1, 	}
 	local config = { 		["unlock_soul"] = unlock_soul,
