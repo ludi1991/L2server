@@ -1,0 +1,31 @@
+root = "./"
+thread = 8
+logger = "l2error"
+logger = nil 
+logpath = "."
+harbor = 1
+address = "127.0.0.1:2526"
+master = "127.0.0.1:2013"
+start = "main"  -- main script
+bootstrap = "snlua bootstrap"   -- The service for bootstrap
+standalone = "0.0.0.0:2013"
+luaservice = root.."service/?.lua;"..root.."test/?.lua;"..root.."../gameservice/?.lua"
+lualoader = "lualib/loader.lua"
+preload = "../common/preload.lua"    -- run preload.lua before every lua service run
+snax = root.."examples/?.lua;"..root.."test/?.lua"
+-- snax_interface_g = "snax_g"
+cpath = root.."cservice/?.so"
+daemon = "./skynet.pid"
+
+lua_path = "./lualib/?.lua;./lualib/?/init.lua;../common/?.lua;../gamelogic/lua_for_server/?.lua;../?.lua;../gamelogic/generateNPC/?.lua;../service_save/?.lua"
+
+
+redis_addr = "127.0.0.1"
+redis_port = 6379
+
+
+mysql_host = "121.40.241.223"
+mysql_port = 3306
+mysql_database = "L2"
+mysql_user = "ludi"
+mysql_password = "67108864ld"
