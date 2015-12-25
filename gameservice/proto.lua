@@ -48,7 +48,7 @@ proto.c2s = sprotoparser.parse [[
     soul_girl_id 2 :integer  #魂的武器娘id 
 }
 
-.fightdata {  #玩家战斗信息
+.arena_fightdata {  #玩家战斗信息
     playerid 0 : integer
     nickname 1 : string
     head_sculpture 2 : integer
@@ -63,8 +63,8 @@ proto.c2s = sprotoparser.parse [[
 
 
 #fight data
-.soul_fightdata {
-    soul 0 : soul
+.fightdata {
+    souls 0 : *soul
     items 1 : *item(itemid)
 }
 
@@ -324,8 +324,8 @@ get_fight_data 23 {
         fight_type 0 : integer  #type 1 1v1 3 3v3
     }
     response {
-        enemy_data 0 : *fightdata
-        player_data 1 : fightdata
+        enemy_data 0 : *arena_fightdata
+        player_data 1 : arena_fightdata
         enemy_rank 2 : *integer
         player_rank 3 : integer
     }
@@ -550,7 +550,7 @@ lab_get_data 44 {
     }
     response {
         lab_data 0 : labdata
-        fight_data 1 : soul_fightdata
+        fight_data 1 : fightdata
     }
 }
 

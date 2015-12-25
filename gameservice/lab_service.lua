@@ -172,9 +172,9 @@ end
 
 
 function command.START_HOURGLASS(playerid,glassid,sandtype)
-	log("start_hourglass "..playerid.." "..glassid.." "..sandtype)
+	--log("start_hourglass "..playerid.." "..glassid.." "..sandtype)
 	if lab_data[playerid] == nil then 
-	    log("no playerid")
+	   -- log("no playerid")
 	    return false
 	end
 	--log (dump(lab_data[playerid].hourglass[glassid]))
@@ -346,9 +346,11 @@ end
 function command.GET_DATA(playerid)
 	if lab_data[playerid] then
 		local keeper = lab_data[playerid].keeper
-		local soul = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"souls")
-		local items = skynet.call("DATA_CENTER","lua","generate_soul_items",playerid,keeper)
-		return true, { lab_data = lab_data[playerid] , fight_data = { soul = soul[keeper] , items = items}}
+		local souls = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"souls")
+        local ids = {}
+        for id,_ in pairs(souls) do table.insert(ids,id) end
+		local items = skynet.call("DATA_CENTER","lua","generate_soul_items",playerid,ids)
+		return true, { lab_data = lab_data[playerid] , fight_data = { souls = souls , items = items}}
 	else
 		return false
 	end
@@ -453,8 +455,8 @@ local function robot_work()
         		if hg.status == GLASS_EMPTY then    
         		    if math.random(2) == 1 then	
                         local sandtype
-                        local rand = math.random(1,robotid-1000000)
-                        if rand < 200 then
+                        local rand = math.random(1,1001 - (robotid-1000000) )
+                        if rand > 200 then
                             sandtype = 1 
                         elseif rand >= 200 and rand < 400 then
                             sandtype = 2
