@@ -125,7 +125,7 @@ function command.CREATE_PLAYER(nickname)
 
     player.items = { 
                         [1500001] = { itemid = 1500001 ,itemtype = 1500001 ,itemcount = 3} , 
-                        -- [1400001] = { itemid = 1400001 , itemtype = 1400001 , itemcount = 10} ,
+                      --  [1100101] = { itemid = 1100101 , itemtype = 1100101 , itemcount = 10} ,
                         -- [1400002] = { itemid = 1400002 , itemtype = 1400002 , itemcount = 10} ,   
                         -- [1400003] = { itemid = 1400003 , itemtype = 1400003 , itemcount = 10} ,   --电池
                         -- [1400004] = { itemid = 1400004 , itemtype = 1400004 , itemcount = 10} ,   --电池

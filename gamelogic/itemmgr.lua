@@ -167,11 +167,12 @@ function itemmgr:item_add_hole(itemid)
 end
 
 function itemmgr:item_inset_gem(itemid,gem_type,gem_hole_pos)
+    log ("inset_gem"..itemid.." "..gem_type.." "..gem_hole_pos)
 	if self:have_item(itemid) == false then return false end
 	if self:have_item(gem_type) == false then return false end
 	if self.items[itemid].gem_id[gem_hole_pos] ~= nil then
 		self.items[itemid].gem_id[gem_hole_pos] = gem_type
-        self.items[itemid].delete_item(gem_type,1)
+        itemmgr:delete_item(gem_type,1)
         statmgr:add_daily_stat("inset_gem")
         taskmgr:update_tasks_by_condition_type(E_INSET_GEM)
 		return true
