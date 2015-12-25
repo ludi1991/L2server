@@ -51,15 +51,16 @@ proto.c2s = sprotoparser.parse [[
 .fightdata {  #玩家战斗信息
     playerid 0 : integer
     nickname 1 : string
-    imageid 2 : integer
+    head_sculpture 2 : integer
     level 3 : integer
-    one_vs_one_fp 4 : integer
-    one_vs_one_soul 5: soul
-    one_vs_one_items 6 : *item(itemid)
-    three_vs_three_fp 7 : integer
-    three_vs_three_souls 8 : *soul(soulid)
-    three_vs_three_items 9 : *item(itemid)
+    single_fp 4 : integer
+    team_fp 5 : integer
+    single_id 6: integer
+    team_ids 7: *integer
+    souls 8: *soul
+    items 9 : *item(itemid)
 }
+
 
 #fight data
 .soul_fightdata {
@@ -78,6 +79,8 @@ proto.c2s = sprotoparser.parse [[
     items 7: *item
     percent 8: integer    #完成百分比
     dropid 9 : integer    #投放模型
+    need 10 : integer #需求量
+    finished 11: integer #完成量
 }
 
 
@@ -111,6 +114,16 @@ proto.c2s = sprotoparser.parse [[
     hourglass 2 : *hourglass(glassid)
     safe_time 3 : integer #-1 unsafe 
     
+}
+
+.shopitem {
+    pos 0 : integer #栏位
+    itemtype 1 : integer #物品编号
+    item_number 2 : integer #物品单次购买的数量
+    have_bought 3 : integer #已购买次数
+    buy_limit 4 : integer #限制购买次数
+    is_recommend 5 : boolean #是否推荐
+    discount 6 : integer #折扣 1~100
 }
 
 
@@ -692,6 +705,27 @@ get_quick_pass_used_time 61 {
     }
 }
 
+get_shop_data 62 {
+    request {
+        shoptype 0 : integer
+    }
+    response {
+        shopitems 0 : *shopitem(pos)
+        unique_id 1 : integer 
+    }
+}
+
+shop_buy 63 {
+    request {
+        shoptype 0 : integer
+        pos 1 : integer
+        unique_id 2 : integer
+    }
+    response {
+        result 0 : integer # 1-成功 2-商店已经刷新过 3-购买次数不足 4-货币不足
+    }
+}
+
 set_sculpture 70 {
     request {
         sculpture 0 : integer
@@ -707,6 +741,28 @@ set_nickname 71 {
     }
     response {
         result 0 : integer
+    }
+}
+
+hand_of_midas 72 {
+    response {
+        result 0 : integer #1-success 0-failed(no time left)  -1 --- not enoutgh diamond 
+        double 1 : boolean
+        gold 2 : integer  #if double , gold = gold * 2 so do not *2 again
+        diamond_consumed 3 : integer
+    }
+}
+
+get_daily_midas_times 73 {
+    response {
+        result 0 : integer
+    } 
+}
+
+get_arena_daily_times 74 {
+    response {
+        single 0 : integer
+        team 1 : integer
     }
 }
 

@@ -16,6 +16,43 @@ local ROBOT_COUNT = 1000
 local arena_1v1_lock_tbl = {}
 local arena_3v3_lock_tbl = {}
 
+local function lock_update()
+    while true do
+        for t=1,2 do
+            local remove_tbl = {}
+            local lock_tbl = t == 1 and arena_1v1_lock_tbl or arena_3v3_lock_tbl 
+            for i,_ in pairs(lock_tbl) do
+                lock_tbl[i] = lock_tbl[i] - 1
+                if lock_tbl[i] <= 0 then
+                    table.insert(remove_tbl,i)
+                end
+            end
+
+            for _,v in pairs(remove_tbl) do
+                lock_tbl[v] = nil
+            end
+        end
+    --log(dump(arena_1v1_lock_tbl))
+    skynet.sleep(100)
+    end
+end
+
+
+local function load_from_savedata()
+    if file_exists("../service_save/arena_data.lua") then
+        local data = require "arena_data"
+        arena_1v1 = data.arena_1v1
+        arena_3v3 = data.arena_3v3
+        arena_1v1_index = data.arena_1v1_index
+        arena_3v3_index = data.arena_3v3_index
+        arena_1v1_lock_tbl = data.arena_1v1_lock_tbl
+        arena_3v3_lock_tbl = data.arena_3v3_lock_tbl
+        return true
+    else
+        log ("nodata")
+        return false
+    end
+end
 
 local function lock_player(playerid,arena_type)
     log("lock"..playerid.." "..arena_type)
@@ -110,35 +147,36 @@ function command.DUMP(arenatype)
     end
 end
 
-
-
 local function init_robot()
     for i=1,ROBOT_COUNT do
         command.REGISTER(1000000+i)
     end
 end
 
-
-local function lock_update()
-    while true do
-        for t=1,2 do
-            local remove_tbl = {}
-            local lock_tbl = t == 1 and arena_1v1_lock_tbl or arena_3v3_lock_tbl 
-            for i,_ in pairs(lock_tbl) do
-                lock_tbl[i] = lock_tbl[i] - 1
-                if lock_tbl[i] <= 0 then
-                    table.insert(remove_tbl,i)
-                end
-            end
-
-            for _,v in pairs(remove_tbl) do
-                lock_tbl[v] = nil
-            end
-        end
-    --log(dump(arena_1v1_lock_tbl))
-    skynet.sleep(100)
-    end
+function command.SAVE(savepath)
+    savepath = savepath or "../service_save/arena_data.lua"
+    log("save_arena_service")
+    local fd = io.open(savepath,"w+")
+    local str = dump(
+    {
+        arena_1v1 = arena_1v1,
+        arena_3v3 = arena_3v3,
+        arena_1v1_index = arena_1v1_index,
+        arena_3v3_index = arena_3v3_index,
+        arena_1v1_lock_tbl = arena_1v1_lock_tbl,
+        arena_3v3_lock_tbl = arena_3v3_lock_tbl,
+    })
+    fd:write("data = \n")
+    fd:write(str)
+    fd:write("\n return data")
+    fd:flush()
+    fd:close()
 end
+
+
+
+
+
 
 skynet.start(function()
     skynet.dispatch("lua", function(session, address, cmd, ...)
@@ -151,6 +189,9 @@ skynet.start(function()
     end)
     skynet.register "ARENA_SERVICE"
     skynet.fork(lock_update)
-    init_robot()
 
+    if not load_from_savedata() then
+        log("failed to load old data, init new robot for arena_service")
+        init_robot()
+    end
 end)

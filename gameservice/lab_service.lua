@@ -7,17 +7,17 @@ local queue = require "skynet.queue"
 local cs = queue()
 
 local working_glasses = {}
-
+local working_players = {}
 
 -- player under protection
 local safe_tbl = {}
 
 local command = {}
 
-
-local MAX_ACC = 30
-
-local ROBOT_IDS = { 905,904,903 }
+local ROBOT_IDS = {}
+for i = 1,1000 do
+    table.insert(ROBOT_IDS,i+1000000)
+end
 
 -- 4 status of sandglass
 local GLASS_CLOSED = -1
@@ -121,8 +121,8 @@ function command.REGISTER(playerid)
 			atk_count = 2,
 			safe_time = -1,
 	        be_attacked_list = {
-	            [1] = { playerid = 905, lost = 0, nickname = "abc",head_sculpture = 3,result = false ,attack_time = os.date("%Y-%m-%d %X"),level = 3},
-	            [2] = { playerid = 904, lost = 1500, nickname = "def",head_sculpture = 1,result = false,attack_time = os.date("%Y-%m-%d %X"),level = 4}
+	          --  [1] = { playerid = 905, lost = 0, nickname = "abc",head_sculpture = 3,result = false ,attack_time = os.date("%Y-%m-%d %X"),level = 3},
+	          --  [2] = { playerid = 904, lost = 1500, nickname = "def",head_sculpture = 1,result = false,attack_time = os.date("%Y-%m-%d %X"),level = 4}
 	    	},
 			hourglass = {	
 				{ 
@@ -221,8 +221,12 @@ function command.HELP_FRIEND(playerid,targetid,glassid,unique_id)
 	end
 end
 
-function command.MATCH_PLAYER()
-	local playerid = 904
+function command.MATCH_PLAYER(level)
+    local lower = (level - 5) * 25
+    if lower < 1 then lower = 1 end
+    local upper = (level + 5) * 25
+    if upper > 1000 then upper = 1000 end
+	local playerid = 1000000+1001-math.random(lower,upper)
     local basic = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"basic")
 	return {
         result = 1,
@@ -389,6 +393,25 @@ function command.UNLOCK_HOURGLASS(playerid,glassid)
 	end
 end
 
+function command.SAVE(savepath)
+    savepath = savepath or "../service_save/lab_data.lua"
+    log("afsadfasdf"..dump(savepath))
+    log("save_lab_service")
+    local fd = io.open(savepath,"w+")
+    local str = dump(
+    {
+       working_glasses = working_glasses,
+       safe_tbl = safe_tbl,
+       lab_data = lab_data,
+    })
+    fd:write("data = \n")
+    fd:write(str)
+    fd:write("\n return data")
+    fd:flush()
+    fd:close()
+end
+
+
 
 local function update_working_glass()
 	while true do
@@ -429,18 +452,26 @@ local function robot_work()
         	for _,hg in pairs(lab_data[robotid].hourglass) do
         		if hg.status == GLASS_EMPTY then    
         		    if math.random(2) == 1 then	
-                        local sandtype = math.random(1,3)
+                        local sandtype
+                        local rand = math.random(1,robotid-1000000)
+                        if rand < 200 then
+                            sandtype = 1 
+                        elseif rand >= 200 and rand < 400 then
+                            sandtype = 2
+                        else
+                            sandtype = 3
+                        end
         				command.START_HOURGLASS(hg.playerid,hg.glassid,sandtype)
-                        log("SUCCESS!robotid "..robotid.. "put "..sandtype.. "into glass "..hg.glassid)
+                       -- log("SUCCESS!robotid "..robotid.. "put "..sandtype.. "into glass "..hg.glassid)
                     else
-                        log("FAILED!robotid "..robotid.. "put ".. "into glass "..hg.glassid)
+                       -- log("FAILED!robotid "..robotid.. "put ".. "into glass "..hg.glassid)
                     end
         		elseif hg.status == GLASS_FULL then
         			if math.random(2) == 1 then
         				command.HARVEST(hg.playerid,hg.glassid)
-                        log("SUCCESS!robotid "..robotid.." harvest "..hg.glassid)
+                       -- log("SUCCESS!robotid "..robotid.." harvest "..hg.glassid)
         			else
-                        log("FAILED!robotid "..robotid.. "harvest "..hg.glassid)
+                       -- log("FAILED!robotid "..robotid.. "harvest "..hg.glassid)
                     end
         		end
         	end
@@ -451,6 +482,18 @@ local function robot_work()
 end
 
 
+local function load_from_savedata()
+    if file_exists("../service_save/lab_data.lua") then
+        local data = require "lab_data"
+        lab_data = data.lab_data
+        working_glasses = data.working_glasses
+        safe_tbl = data.safe_tbl
+        return true
+    else
+        log ("nodata in lab save data")
+        return false
+    end
+end
 
 
 skynet.start(function()
@@ -465,7 +508,12 @@ skynet.start(function()
 	end)
 	skynet.fork(update_working_glass)
 	skynet.fork(update_safe_tbl)
-	skynet.fork(robot_register)
+    if not load_from_savedata() then
+        log ("lab register robot")
+	    robot_register()
+    --    command.SAVE()
+    end
 	skynet.fork(robot_work,1000)
 	skynet.register "LAB_SERVICE"
+
 end)

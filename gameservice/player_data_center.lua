@@ -103,6 +103,7 @@ function command.GENERATE_SOUL_ITEMS(playerid,soulid)
     return items
 end
 
+
 function command.CREATE_PLAYER(nickname)
 	local player = {}
     local sqlstr = "SELECT playerid FROM L2.player_savedata order by playerid desc limit 1"
@@ -142,7 +143,7 @@ function command.CREATE_PLAYER(nickname)
 
     }
     player.friend = {
-        905,904,903
+        1000000+math.random(701,800),1000000+math.random(801,900),1000003+math.random(901,1000)
     }
     player.stat = 
     {
@@ -175,7 +176,13 @@ function command.CREATE_PLAYER(nickname)
             kill_boss = 0,
             quick_fight = 0,
             task_total_score = 0,
+            hand_of_midas = 0,
         }
+    }
+    player.shop = {
+        [E_SHOP_TYPE_HOT] = {},
+        [E_SHOP_TYPE_TIME_LIMIT] = {},
+        [E_SHOP_TYPE_VIP] = {}
     }
 	return newplayerid,player
 end
@@ -227,7 +234,11 @@ function command.GET_PLAYER_FIGHTPOWER(playerid,ranktype,listtype)
 
     elseif listtype == 2 then
         if ranktype == 1 then
-            return fp[player.config.soulid_1v1]
+            local sum = 0
+            for _,v in pairs(fp) do
+                sum = sum + v
+            end
+            return sum
         elseif ranktype == 2 then
             local sum = 0
             for _,v in pairs(player.config.soulid_3v3) do 

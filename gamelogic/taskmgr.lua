@@ -45,8 +45,8 @@ end
 
 function taskmgr:add_task(taskid)
 	local player = self.player
-	local percent = taskmgr:cal_task_percent(taskid)
-	player.tasks[taskid] = { taskid = taskid , percent = percent}
+	local percent,need,finished = taskmgr:cal_task_status(taskid)
+	player.tasks[taskid] = { taskid = taskid , percent = percent , need = need ,finished = finished}
 	--log (dump(player))
 end
 
@@ -61,19 +61,15 @@ function taskmgr:have_task(taskid)
 end
 
 -- 计算任务完成了多少
-function taskmgr:cal_task_percent(taskid)
+function taskmgr:cal_task_status(taskid)
 	local details = self:get_task_details(taskid)
 	--log (dump(details))
 	local condition_type = details.needs_type
 	local param1 = details.needs_target
 	local param2 = details.needs_num
-	--log ("cal_task_percent "..param1.." "..param2)
-    local finished,percent = self:check_condition(condition_type,param1,param2)
-	if finished then
-		return 100
-	else
-		return percent or 0
-	end
+	--log ("cal_task_status "..param1.." "..param2)
+    local percent,need,finished = self:check_condition(condition_type,param1,param2)
+	return percent,need,finished
 end
 
 -- 更新任务
@@ -88,9 +84,11 @@ end
 
 function taskmgr:update_task(taskid)
 	local player = self.player
-	local percent = self:cal_task_percent(taskid)
-	if player.tasks[taskid] ~= nil then
-		player.tasks[taskid].percent = percent
+    if player.tasks[taskid] ~= nil then
+        if player.tasks[taskid].percent ~= 100 then
+	        local percent = self:cal_task_status(taskid)
+		    player.tasks[taskid].percent = percent
+        end
 	end 
 end
 
@@ -190,7 +188,9 @@ function taskmgr:generate_tasks(save_tbl)
             diamond = diamond,
             percent = v.percent,
             items = items,
-            dropid = data.drop
+            dropid = data.drop,
+            need = v.need,
+            finished = v.finished,
     	}
         log (""..dump(task))
 
@@ -226,19 +226,28 @@ end
 
 
 
------------------  条件检测
+-----------------  conditon checkers 
+-- functions below should return 3 values : percent, need ,finished
+-- percent mean the percentage of task that have been finished
+-- need means the requirement number(e.g. items count or inset gem times) of the task
+-- finished is same to 'need' but represent the finished number 
+
+
 function taskmgr:have_get_enough_level(level)
 	log("checking have get enough level")
-	return self.player.basic.level > level
+    local percent = self.player.basic.level > level and 100 or 0
+	return percent,1,percent == 100 and 1 or 0
 end
 
 function taskmgr:have_souls(soul_girl_id)
     local souls = self.player.souls
-    return souls[soul_girl_id] ~= nil
+    local percent = souls[soul_girl_id] ~= nil and 100 or 0
+    return percent,1,percent == 100 and 1 or 0
 end
 
 function taskmgr:have_item(itemtype)
-    return taskmgr:have_item_by_itemtype(itemtype)
+    local percent = taskmgr:have_item_by_itemtype(itemtype) and 100 or 0
+    return percent,1,percent == 100 and 1 or 0
 end
 
 function taskmgr:have_unlocked_system(systemid)
@@ -250,9 +259,11 @@ end
 --itemtype 1 gold ,itemtype 2 diamond ,itemtype 3 stone
 function taskmgr:have_consumed_enough(itemtype,count)
 	if itemtype == 1 then
-		return statmgr:get_gold_consumed() >= count
+        local percent = statmgr:get_gold_consumed() >= count
+	    return percent,count,statmgr:get_gold_consumed()
 	elseif itemtype == 2 then
-		return statmgr:get_diamond_consumed() >= count
+		local percent = statmgr:get_diamond_consumed() >= count
+        return percent,count,statmgr:get_diamond_consumed()
 	end
 end
 
@@ -260,15 +271,16 @@ function taskmgr:passed_level(levelid)
 end
 
 function taskmgr:have_melt_enough_times(times)
-	return statmgr:get_melt_times() >= times
+    local percent = statmgr:get_melt_times() >= times and 100 or 0 
+	return percent,times,statmgr:get_melt_times() >= times
 end
 
 
-function  taskmgr:have_enough_daily_score(score_need)
+function  taskmgr:have_enough_daily_score(need)
     local count = statmgr:get_daily_stat("task_total_score")
-    local score = math.floor(count/score_need*100)
+    local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score==100,score
+    return score,count,need
 end
 
 function taskmgr:have_wear_equip()
@@ -278,28 +290,28 @@ function taskmgr:strengthen_equip(need)
     local count = statmgr:get_daily_stat("strengthen_equip")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:upgrade_equip(need)
     local count = statmgr:get_daily_stat("upgrade_equip")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:inset_gem(need)
     local count = statmgr:get_daily_stat("inset_gem")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:upgrade_gem(need)
     local count = statmgr:get_daily_stat("upgrade_gem")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:equip_resonances(level,count_need)
@@ -327,8 +339,9 @@ function taskmgr:equip_resonances(level,count_need)
             count = count + 1
         end
     end
-    log("axiba"..count.." "..count_need.." "..level)
-    return count >= count_need
+    local percent = count >= count_need and 100 or 0
+    if count > count_need then count = count_need end
+    return percent,count_need,count
 end
 
 function taskmgr:gem_max_level(level)
@@ -343,45 +356,49 @@ function taskmgr:gem_max_level(level)
             end
         end
     end
-    return max >= level
+    local percent = max >= level and 100 or 0
+    if max > level then max = level end
+    return percent,level,max
 end
 
 function taskmgr:arena_single(need)
     local count = statmgr:get_daily_stat("arena_single_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_team(need)
     local count = statmgr:get_daily_stat("arena_team_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_single_victory(need)
     local count = statmgr:get_daily_stat("arena_single_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_team_victory(need)
     local count = statmgr:get_daily_stat("arena_team_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_rank_1v1(need)
     local rank = skynet.call("ARENA_SERVICE","lua","get_index_by_playerid",self.player.basic.playerid,1)
-    return rank <= need
+    local percent = rank <= need and 100 or 0
+    return percent,1,rank <= need and 1 or 0 
 end
 
 function taskmgr:arena_rank_3v3(need)
     local rank = skynet.call("ARENA_SERVICE","lua","get_index_by_playerid",self.player.basic.playerid,2)
-    return rank <= need
+    local percent = rank <= need and 100 or 0
+    return percent,1,rank <= need and 1 or 0 
 end
 
 
@@ -389,28 +406,28 @@ function taskmgr:arena_single_total(need)
     local count = statmgr:get_stat("arena_single_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_team_total(need)
     local count = statmgr:get_stat("arena_team_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_single_victory_total(need)
     local count = statmgr:get_stat("arena_single_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:arena_team_victory_total(need)
     local count = statmgr:get_stat("arena_team_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 
@@ -418,70 +435,70 @@ function taskmgr:lab_harvest(need)
     local count = statmgr:get_daily_stat("lab_harvest")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:lab_steal(need)
     local count = statmgr:get_daily_stat("lab_steal")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:lab_help(need)
     local count = statmgr:get_daily_stat("lab_help")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:lab_harvest_total(need)
     local count = statmgr:get_stat("lab_harvest")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:lab_steal_total(need)
     local count = statmgr:get_stat("lab_steal")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:lab_help_total(need)
     local count = statmgr:get_stat("lab_help")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:kill_boss(need)
     local count = statmgr:get_stat("kill_boss")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:kill_boss_total(need)
     local count = statmgr:get_daily_stat("kill_boss")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:quick_fight(need)
     local count = statmgr:get_daily_stat("quick_fight")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 function taskmgr:quick_fight_total(need)
     local count = statmgr:get_stat("quick_fight")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score == 100 ,score
+    return score,count,need
 end
 
 

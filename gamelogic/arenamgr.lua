@@ -46,27 +46,22 @@ function arenamgr:get_fight_data(arena_type)
         local data = skynet.call("DATA_CENTER","lua","get_player_data",v)
         local one_vs_one_fp = skynet.call("DATA_CENTER","lua","get_player_fightpower",v,1,2)
         local three_vs_three_fp = skynet.call("DATA_CENTER","lua","get_player_fightpower",v,2,2)
-        local one_vs_one_items = skynet.call("DATA_CENTER","lua","generate_soul_items",v,data.config.soulid_1v1)
-        local three_vs_three_items = skynet.call("DATA_CENTER","lua","generate_soul_items",v,data.config.soulid_3v3)
-        local three_vs_three_souls = {}
-        for i,v in pairs(data.config.soulid_3v3) do
-            if data.souls[v] then
-                three_vs_three_souls[v] = data.souls[v]
-            else
-                log ("soul "..v.."not exist")
-            end
+        local soulids = {}
+        for id,_ in pairs(data.souls) do
+            table.insert(soulids,id)
         end
+        local items = skynet.call("DATA_CENTER","lua","generate_soul_items",v,soulids)
         local fightdata = {
             playerid = v,
             nickname = data.basic.nickname,
-            imageid = data.basic.head_sculpture,
+            head_sculpture = data.basic.head_sculpture,
             level = data.basic.level,
-            one_vs_one_fp = one_vs_one_fp,
-            one_vs_one_soul = data.souls[data.config.soulid_1v1],
-            one_vs_one_items = one_vs_one_items,
-            three_vs_three_fp = three_vs_three_fp,
-            three_vs_three_souls = three_vs_three_souls,
-            three_vs_three_items = three_vs_three_items,
+            single_fp = one_vs_one_fp,
+            team_fp = three_vs_three_fp,
+            single_id = data.config.soulid_1v1,
+            team_ids = data.config.soulid_3v3,
+            souls = data.souls,
+            items = items
         }
         return fightdata
     end
@@ -138,6 +133,16 @@ function arenamgr:fight(enemyid,arena_type,result)
 end
 
 function arenamgr:start_fight(enemyid,arena_type)
+    local daily_times
+    if arena_type == 1 then
+        daily_times = statmgr:get_daily_stat("arena_single_times")
+    elseif arena_type == 2 then
+        daily_times = statmgr:get_daily_stat("arena_team_times")
+    end
+    if daily_times >= 5 then
+        return { result = 0}
+    end
+
     local res = skynet.call("ARENA_SERVICE","lua","start_fight",self.player.basic.playerid,enemyid,arena_type)
     if res then
         return { result = 1 }

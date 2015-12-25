@@ -77,7 +77,7 @@ function labmgr:lab_get_data(playerid)
 end
 
 function labmgr:lab_match_player()
-	return skynet.call("LAB_SERVICE","lua","match_player")
+	return skynet.call("LAB_SERVICE","lua","match_player",self.player.basic.level)
 end
 
 function labmgr:lab_steal(targetid,result)

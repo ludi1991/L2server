@@ -11,6 +11,7 @@ local labmgr = require "gamelogic.labmgr"
 local friendmgr = require "gamelogic.friendmgr"
 local arenamgr = require "gamelogic.arenamgr"
 local rankmgr = require "gamelogic.rankmgr"
+local shopmgr = require "gamelogic.shopmgr"
 local fp_cal = require "gamelogic.fp_calculator"
 
 local WATCHDOG
@@ -25,17 +26,6 @@ local player = {}
 
 local redis_need_sync = false
 
-local redis_single_fp_name = "fp_single_rank"
-local redis_team_fp_name = "fp_team_rank"
-local redis_1v1_name = "1v1_rank"
-local redis_3v3_name = "3v3_rank"
-
-local redis_name_tbl = {
-	redis_single_fp_name,
-	redis_team_fp_name,
-	redis_1v1_name,
-	redis_3v3_name
-}
 
 
 local function send_package(pack)
@@ -218,6 +208,7 @@ function REQUEST:login()
     friendmgr:init(player)
     rankmgr:init(player)
     arenamgr:init(player)
+    shopmgr:init(player)
 
 
     skynet.fork(function()
@@ -332,6 +323,7 @@ end
 
 function REQUEST:get_tasks()
 	if player.tasks ~= nil then
+        log ("get_tasks"..dump(taskmgr:generate_tasks(player.tasks)))
 		return { tasks = taskmgr:generate_tasks(player.tasks)}
 	else
 		print ("get_tasks_failed")
@@ -655,13 +647,57 @@ function REQUEST:get_quick_pass_used_time()
 end
 
 function REQUEST:set_sculpture()
-    self.basic.player.sculpture = self.sculpture
-    return { result = 1}
+    player.basic.head_sculpture = self.sculpture
+    return { result = 1 }
 end
 
 function REQUEST:set_nickname()
-    self.basic.player.nickname = self.nickname
-    return { result = 1}
+    player.basic.nickname = self.nickname
+    return { result = 1 }
+end
+
+function REQUEST:hand_of_midas()
+    local data = require "handofmidas"
+    local cur =  statmgr:get_daily_stat("hand_of_midas")
+    local next_data = data[cur+1]
+    if next_data then
+        if have_enough_diamond(next_data.costdiamond) then
+            add_diamond(-next_data.costdiamond)
+            local gold = next_data.gold
+            local isdouble = math.random() >= next_data.doublechance
+            if isdouble then
+                gold = gold * 2
+            end
+            add_gold(gold)
+            statmgr:add_stat("hand_of_midas")
+            return { result = 1, gold = gold , double = isdouble , diamond_consumed = next_data.costdiamond}
+        else
+            return { result = -1 }
+        end
+    else
+        return { result = 0 }
+    end
+end
+
+
+function REQUEST:get_daily_midas_time()
+    return statmgr:get_daily_stat("hand_of_midas")
+end
+
+function REQUEST:get_arena_daily_times()
+    local single = statmgr:get_daily_stat("arena_single_times")
+    local team = statmgr:get_daily_stat("arena_team_times")
+    return { single = single , team = team }
+
+end
+
+function REQUEST:get_shop_data()
+    local shopitems,unique_id = shopmgr:get_shop_data(self.shoptype)
+    return {shopitems = shopitems, unique_id = unique_id}
+end
+
+function REQUEST:shop_buy()
+    return { result = shopmgr:shop_buy(self.shoptype, self.pos, self.unique_id)}
 end
 
 --落地数据到数据库
@@ -681,9 +717,11 @@ function REQUEST:create_new_player()
     friendmgr:init(player)
     arenamgr:init(player)
     rankmgr:init(player)
+    shopmgr:init(player)
 
     taskmgr:trigger_task_by_type(0)
     labmgr:lab_register()
+    shopmgr:refresh(E_SHOP_TYPE_HOT)
     skynet.call("ARENA_SERVICE","lua","register",newplayerid)
 
     save_to_db()
