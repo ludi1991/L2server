@@ -127,6 +127,7 @@ kITEM_GIFT_BAG = 12
 kITEM_HERO = 13
 kITEM_LAB = 14
 kITEM_BOSS_TICKET = 15
+kITEM_SKILL = 16
 kITEM_GIFT = 88
 
 STRENGTHEN_STONE_ITEM_ID = 1000001
@@ -162,6 +163,7 @@ if config.limit_open_system then
     UNLOCK_LAB_INSTRUMENT_3 = 24 --家园生产仪器3
     UNLOCK_BAG = 1 --背包
     UNLOCK_QUICK_FIGHT = 7 --快速挂机
+    UNLOCK_SUMMONER_SPELL = 25
 else
     UNLOCK_AUTO_FIGHT = 1 --自动战斗
     UNLOCK_DELAY_TASK = 1 --每日任务
@@ -178,6 +180,7 @@ else
     UNLOCK_LAB_INSTRUMENT_3 = 1  --家园生产仪器3
     UNLOCK_BAG = 1 --背包
     UNLOCK_QUICK_FIGHT = 1 --快速挂机
+    UNLOCK_SUMMONER_SPELL = 1
 end
 
 
