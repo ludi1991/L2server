@@ -54,8 +54,8 @@ function arenamgr:get_fight_data(arena_type)
 
         local team_ids = {}
         for _,v in pairs(data.config.soulid_3v3) do
-            if souls[v] ~= nil then
-                table.insert(v)
+            if data.souls[v] ~= nil then
+                table.insert(team_ids,v)
             end
         end
 

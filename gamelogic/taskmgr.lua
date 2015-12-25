@@ -272,7 +272,7 @@ end
 
 function taskmgr:have_melt_enough_times(times)
     local percent = statmgr:get_melt_times() >= times and 100 or 0 
-	return percent,times,statmgr:get_melt_times() >= times
+	return percent,times,statmgr:get_melt_times()
 end
 
 
@@ -280,7 +280,7 @@ function  taskmgr:have_enough_daily_score(need)
     local count = statmgr:get_daily_stat("task_total_score")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:have_wear_equip()
@@ -290,28 +290,28 @@ function taskmgr:strengthen_equip(need)
     local count = statmgr:get_daily_stat("strengthen_equip")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:upgrade_equip(need)
     local count = statmgr:get_daily_stat("upgrade_equip")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:inset_gem(need)
     local count = statmgr:get_daily_stat("inset_gem")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:upgrade_gem(need)
     local count = statmgr:get_daily_stat("upgrade_gem")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:equip_resonances(level,count_need)
@@ -365,28 +365,28 @@ function taskmgr:arena_single(need)
     local count = statmgr:get_daily_stat("arena_single_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_team(need)
     local count = statmgr:get_daily_stat("arena_team_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_single_victory(need)
     local count = statmgr:get_daily_stat("arena_single_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_team_victory(need)
     local count = statmgr:get_daily_stat("arena_team_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_rank_1v1(need)
@@ -406,28 +406,28 @@ function taskmgr:arena_single_total(need)
     local count = statmgr:get_stat("arena_single_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_team_total(need)
     local count = statmgr:get_stat("arena_team_times")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_single_victory_total(need)
     local count = statmgr:get_stat("arena_single_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:arena_team_victory_total(need)
     local count = statmgr:get_stat("arena_team_victory")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 
@@ -435,70 +435,70 @@ function taskmgr:lab_harvest(need)
     local count = statmgr:get_daily_stat("lab_harvest")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:lab_steal(need)
     local count = statmgr:get_daily_stat("lab_steal")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:lab_help(need)
     local count = statmgr:get_daily_stat("lab_help")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:lab_harvest_total(need)
     local count = statmgr:get_stat("lab_harvest")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:lab_steal_total(need)
     local count = statmgr:get_stat("lab_steal")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:lab_help_total(need)
     local count = statmgr:get_stat("lab_help")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:kill_boss(need)
     local count = statmgr:get_stat("kill_boss")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:kill_boss_total(need)
     local count = statmgr:get_daily_stat("kill_boss")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:quick_fight(need)
     local count = statmgr:get_daily_stat("quick_fight")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 function taskmgr:quick_fight_total(need)
     local count = statmgr:get_stat("quick_fight")
     local score = math.floor(count/need*100)
     if score > 100 then score = 100 end
-    return score,count,need
+    return score,need,count
 end
 
 
