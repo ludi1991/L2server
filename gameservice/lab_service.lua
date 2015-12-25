@@ -350,6 +350,7 @@ function command.GET_DATA(playerid)
         local ids = {}
         for id,_ in pairs(souls) do table.insert(ids,id) end
 		local items = skynet.call("DATA_CENTER","lua","generate_soul_items",playerid,ids)
+        log ("heheda")
 		return true, { lab_data = lab_data[playerid] , fight_data = { souls = souls , items = items}}
 	else
 		return false

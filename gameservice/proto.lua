@@ -726,6 +726,18 @@ shop_buy 63 {
     }
 }
 
+use_gift_bag 64 {
+    request {
+        itemtype 0 : integer
+    }
+    response {
+        result 0 : integer
+        items 1: *item(itemid)
+        gold 2 : integer
+        diamond 3 : integer
+    }
+}
+
 set_sculpture 70 {
     request {
         sculpture 0 : integer
@@ -765,6 +777,7 @@ get_arena_daily_times 74 {
         team 1 : integer
     }
 }
+
 
 
 ]]

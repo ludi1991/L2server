@@ -16,7 +16,7 @@ end
 
 function itemmgr:can_stack(itemtype)
 	--if itemid == 1000001 then return true end
-	if itemtype < 2000000 then return true end
+	if itemtype < 2000000 or itemtype >= 3000000 then return true end
 	return false
 end
 
@@ -205,6 +205,42 @@ function itemmgr:add_stone(value)
 	end
 	return true
 end
+
+
+
+
+function itemmgr:use_gift_bag(itemtype)
+    log ("use gift "..itemtype)
+    if not itemmgr:have_item(itemtype) then
+        return  { result = 0 }
+    else
+        local dm = require "gamelogic.lua_for_server.controller.drop_manager"
+        local item_data = require "data.equipdata"
+        local drop_id = item_data[itemtype].mode_id
+        local items = dm:getEquipDrops(drop_id)
+        local gold = dm:getGold(drop_id)
+        local diamond = dm:getDiamond(drop_id)
+        local items_res = {}
+        log("heheda "..dump(items))
+        for _,item in pairs(items) do
+            local item_gen = self:add_item(item.dropid,item.dropNum)
+            table.insert(items_res,item_gen)
+            --items_res[item_gen.itemid] = itemgen
+        end
+        self:delete_item(itemtype)
+
+        return {
+            result = 1,
+            items = items_res,
+            gold = gold,
+            diamond = diamond,
+        }
+    end
+end
+
+
+
+
 
 
 

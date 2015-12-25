@@ -471,16 +471,11 @@ function REQUEST:get_fight_data()
 end
 
 function REQUEST:set_fight_soul()
-	if player.player_config == nil then
-		print ("set_fight_soul failed!")
-		return { result = 0 }
-	end
-
     if self.type == 1 then
-    	player.player_config.soulid_1v1 = self.soulid[1]
+    	player.config.soulid_1v1 = self.soulid[1]
     	set_sync_redis_flag()
     elseif self.type == 2 then
-    	player.player_config.soulid_3v3 = self.soulid
+    	player.config.soulid_3v3 = self.soulid
     	set_sync_redis_flag()
     end
     return { result = 1 }
@@ -714,7 +709,7 @@ function REQUEST:create_new_player()
     statmgr:init(player)
     itemmgr:init(player)
     labmgr:init(player)
-    friendmgr:init(player)
+    friendmgr:init(playeragent)
     arenamgr:init(player)
     rankmgr:init(player)
     shopmgr:init(player)
@@ -731,6 +726,9 @@ function REQUEST:create_new_player()
 
 end
 
+function REQUEST:use_gift_bag()
+    return itemmgr:use_gift_bag(self.itemtype)
+end
 
 
 function REQUEST:quit()

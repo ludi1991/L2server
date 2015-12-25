@@ -51,6 +51,14 @@ function arenamgr:get_fight_data(arena_type)
             table.insert(soulids,id)
         end
         local items = skynet.call("DATA_CENTER","lua","generate_soul_items",v,soulids)
+
+        local team_ids = {}
+        for _,v in pairs(data.config.soulid_3v3) do
+            if souls[v] ~= nil then
+                table.insert(v)
+            end
+        end
+
         local fightdata = {
             playerid = v,
             nickname = data.basic.nickname,
@@ -59,7 +67,7 @@ function arenamgr:get_fight_data(arena_type)
             single_fp = one_vs_one_fp,
             team_fp = three_vs_three_fp,
             single_id = data.config.soulid_1v1,
-            team_ids = data.config.soulid_3v3,
+            team_ids = team_ids,
             souls = data.souls,
             items = items
         }

@@ -102,6 +102,7 @@ function shopmgr:shop_buy(shop_type, pos, unique_id)
     --success
     self.player.basic.gold = self.player.basic.gold - cost_gold
     self.player.basic.diamond = self.player.basic.diamond - cost_diamond
+    log ("shop_buy"..shopitem.itemtype.." "..shopitem.item_number)
     itemmgr:add_item(shopitem.itemtype, shopitem.item_number)
     shopitem.have_bought = shopitem.have_bought + 1
 

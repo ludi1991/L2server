@@ -119,7 +119,7 @@ function command.CREATE_PLAYER(nickname)
         last_login_time = os.date("%Y-%m-%d %X"),
         cursoul = 1,
         cur_stayin_level = 1,
-        head_sculpture = 1,
+        head_sculpture = 0,
         vip = 0,
     }
 
