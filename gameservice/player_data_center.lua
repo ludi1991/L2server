@@ -125,11 +125,11 @@ function command.CREATE_PLAYER(nickname)
 
     player.items = { 
                         [1500001] = { itemid = 1500001 ,itemtype = 1500001 ,itemcount = 3} , 
-                      --  [1100101] = { itemid = 1100101 , itemtype = 1100101 , itemcount = 10} ,
-                        -- [1400002] = { itemid = 1400002 , itemtype = 1400002 , itemcount = 10} ,   
-                        -- [1400003] = { itemid = 1400003 , itemtype = 1400003 , itemcount = 10} ,   --电池
-                        -- [1400004] = { itemid = 1400004 , itemtype = 1400004 , itemcount = 10} ,   --电池
-                        -- [1400005] = { itemid = 1400005 , itemtype = 1400005 , itemcount = 10} ,   --电池
+                        [1100101] = { itemid = 1100101 , itemtype = 1100101 , itemcount = 10} ,
+                         [1400002] = { itemid = 1400002 , itemtype = 1400002 , itemcount = 10} ,   
+                         [1400003] = { itemid = 1400003 , itemtype = 1400003 , itemcount = 10} ,   --电池
+                         [1400004] = { itemid = 1400004 , itemtype = 1400004 , itemcount = 10} ,   --电池
+                         [1400005] = { itemid = 1400005 , itemtype = 1400005 , itemcount = 10} ,   --电池
 
                     }
     player.souls = { { soulid = 1 , itemids = { -1,-1,-1,-1,-1,-1,-1,-1 } , soul_girl_id = 1} }

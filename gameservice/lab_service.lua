@@ -222,9 +222,9 @@ function command.HELP_FRIEND(playerid,targetid,glassid,unique_id)
 end
 
 function command.MATCH_PLAYER(level)
-    local lower = (level - 5) * 25
+    local lower = (level - 10) * 25
     if lower < 1 then lower = 1 end
-    local upper = (level + 5) * 25
+    local upper = level * 25
     if upper > 1000 then upper = 1000 end
 	local playerid = 1000000+1001-math.random(lower,upper)
     local basic = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"basic")
@@ -237,7 +237,7 @@ function command.MATCH_PLAYER(level)
 	}
 end
 
-function command.START_STEAL(targetid)
+function command.START_STEAL(playerid,targetid,is_revenge)
 	if is_safe(targetid) then
 		log("start_steal false")
 		return false

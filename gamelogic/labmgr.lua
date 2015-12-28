@@ -94,6 +94,7 @@ function labmgr:lab_steal(targetid,result)
     end
 end
 
+
 function labmgr:lab_harvest(glassid)
 	local res,gold = skynet.call("LAB_SERVICE","lua","harvest",self.player.basic.playerid,glassid)
 	if res == true then
@@ -146,13 +147,13 @@ function labmgr:lab_unlock_hourglass(glassid)
 	end
 end
 
-function labmgr:lab_start_steal(targetid)
+function labmgr:lab_start_steal(targetid,is_revenge)
     if not itemmgr:have_item(KEY_ID) then
         log("don't have energy block , type : "..sandtype)  
         return { result = 0}
     else
         itemmgr:delete_item(KEY_ID)
-    	local res = skynet.call("LAB_SERVICE","lua","start_steal",targetid)
+    	local res = skynet.call("LAB_SERVICE","lua","start_steal",self.player.basic.playerid,targetid,is_revenge)
     	if res == true then
     		return { result = 1}
     	else

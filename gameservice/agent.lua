@@ -199,7 +199,6 @@ function REQUEST:login()
 	set_sync_redis_flag()
 
     log ("player "..self.playerid.." is initalized!","info")
-    log(dump(player))
 
     taskmgr:init(player)
     statmgr:init(player)
@@ -596,7 +595,7 @@ function REQUEST:get_guide_step()
 end
 
 function REQUEST:lab_start_steal()
-    return labmgr:lab_start_steal(self.playerid)
+    return labmgr:lab_start_steal(self.playerid,self.is_revenge)
 end
 
 function REQUEST:quick_pass_level()
