@@ -32,7 +32,7 @@ local function lock_update()
                 lock_tbl[v] = nil
             end
         end
-    --log(dump(arena_1v1_lock_tbl))
+    log(dump(arena_1v1_lock_tbl))
     skynet.sleep(100)
     end
 end

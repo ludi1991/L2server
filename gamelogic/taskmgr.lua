@@ -47,7 +47,6 @@ function taskmgr:add_task(taskid)
 	local player = self.player
 	local percent,need,finished = taskmgr:cal_task_status(taskid)
 	player.tasks[taskid] = { taskid = taskid , percent = percent , need = need ,finished = finished}
-	--log (dump(player))
 end
 
 function taskmgr:delete_task(taskid)
@@ -111,7 +110,6 @@ end
 
 function taskmgr:trigger_task(taskid)
     if self:have_finished_task(taskid) then
-            log ("i have finished task "..taskid )
             return
     else
 
@@ -120,7 +118,6 @@ function taskmgr:trigger_task(taskid)
         local pre = details.pre
 
         if pre then
-            log("pre "..pre)
             pre = string.split(pre,",")
             for i,v in pairs(pre) do
                 local pretask_id = tonumber(v)
@@ -234,7 +231,6 @@ end
 
 
 function taskmgr:have_get_enough_level(level)
-	log("checking have get enough level")
     local percent = self.player.basic.level > level and 100 or 0
 	return percent,1,percent == 100 and 1 or 0
 end

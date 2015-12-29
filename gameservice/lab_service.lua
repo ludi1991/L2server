@@ -120,11 +120,13 @@ function command.REGISTER(playerid)
 			keeper = 1 , 
 			atk_count = 2,
 			safe_time = -1,
-	        be_attacked_list = {
-	          --  [1] = { playerid = 905, lost = 0, nickname = "abc",head_sculpture = 3,result = false ,attack_time = os.date("%Y-%m-%d %X"),level = 3},
+	        be_attacked_list = 
+            {
+	            [1] = { playerid = 1000111, lost = 0, nickname = "abc",head_sculpture = 3,result = false ,attack_time = os.date("%Y-%m-%d %X"),level = 3},
 	          --  [2] = { playerid = 904, lost = 1500, nickname = "def",head_sculpture = 1,result = false,attack_time = os.date("%Y-%m-%d %X"),level = 4}
 	    	},
-			hourglass = {	
+			hourglass = 
+            {	
 				{ 
 				    playerid = playerid ,
 				    glassid = 1,
@@ -242,18 +244,35 @@ function command.START_STEAL(playerid,targetid,is_revenge)
 		log("start_steal false")
 		return false
 	else
-		local res,agent = skynet.call("ONLINE_CENTER","lua","is_online",targetid)
-		if res then
-			pcall(skynet.call,agent,"lua","lab_stolen")
-		end
-		protect_player(targetid)
-		log("start_steal true")
-		return true
+        if is_revenge then
+
+            local have_enemy = false
+            for _,v in pairs(lab_data[playerid].be_attacked_list) do
+                if v.playerid == targetid then
+                    have_enemy = true
+                    break
+                end
+            end
+
+            if not have_enemy then
+                return false
+            end
+
+        else
+        
+    		local res,agent = skynet.call("ONLINE_CENTER","lua","is_online",targetid)
+    		if res then
+    			pcall(skynet.call,agent,"lua","lab_stolen")
+    		end
+
+    		protect_player(targetid)
+    		return true
+        end
 	end
 end
 
 
-function command.STEAL(playerid,targetid,result)
+function command.STEAL(playerid,targetid,result,is_revenge)
 	log("steal!"..playerid.." "..targetid.." "..result)
 	
 	local player_data = lab_data[playerid]
@@ -272,6 +291,19 @@ function command.STEAL(playerid,targetid,result)
 	        	-- nothing
 	        end
 	    end
+
+        if is_revenge then
+            local rm_tbl = {}
+            for i,v in pairs(lab_data[playerid].be_attacked_list) do
+                if v.playerid == targetid then
+                    table.insert(rm_tbl,i)
+                end
+            end
+            for _,v in pairs(rm_tbl) do
+                lab_data[playerid].be_attacked_list[v] = nil
+            end
+        end
+
 	end
     
     local basic = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"basic")
@@ -350,7 +382,6 @@ function command.GET_DATA(playerid)
         local ids = {}
         for id,_ in pairs(souls) do table.insert(ids,id) end
 		local items = skynet.call("DATA_CENTER","lua","generate_soul_items",playerid,ids)
-        log ("heheda")
 		return true, { lab_data = lab_data[playerid] , fight_data = { souls = souls , items = items}}
 	else
 		return false
@@ -398,7 +429,6 @@ end
 
 function command.SAVE(savepath)
     savepath = savepath or "../service_save/lab_data.lua"
-    log("afsadfasdf"..dump(savepath))
     log("save_lab_service")
     local fd = io.open(savepath,"w+")
     local str = dump(

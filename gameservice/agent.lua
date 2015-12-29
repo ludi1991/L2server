@@ -540,7 +540,7 @@ function REQUEST:lab_match_player()
 end
 
 function REQUEST:lab_steal()
-	return labmgr:lab_steal(self.playerid,self.result)
+	return labmgr:lab_steal(self.playerid,self.result,self.is_revenge)
 end
 
 function REQUEST:lab_harvest()

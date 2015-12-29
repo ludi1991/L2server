@@ -80,8 +80,8 @@ function labmgr:lab_match_player()
 	return skynet.call("LAB_SERVICE","lua","match_player",self.player.basic.level)
 end
 
-function labmgr:lab_steal(targetid,result)
-	local res,gold = skynet.call("LAB_SERVICE","lua","steal",self.player.basic.playerid,targetid,result)
+function labmgr:lab_steal(targetid,result,is_revenge)
+	local res,gold = skynet.call("LAB_SERVICE","lua","steal",self.player.basic.playerid,targetid,result,is_revenge)
 	if res == true then
 		self.player.basic.gold = self.player.basic.gold + gold
         statmgr:add_stat("lab_steal")
