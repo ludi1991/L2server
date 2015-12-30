@@ -568,6 +568,7 @@ lab_steal 46 {
     request {
         playerid 0 : integer
         result 1 : integer #1success 0 failed
+        is_revenge 2 : boolean
     }   
     response {
         result 0 : integer #1success 0 failed
@@ -671,6 +672,7 @@ get_guide_step 57 {
 lab_start_steal 58 {
     request {
         playerid 0 : integer
+        is_revenge 1 : boolean
     }
     response {
         result 0 : integer #success 1 failed

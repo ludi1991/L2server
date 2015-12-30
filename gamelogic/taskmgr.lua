@@ -47,7 +47,6 @@ function taskmgr:add_task(taskid)
 	local player = self.player
 	local percent,need,finished = taskmgr:cal_task_status(taskid)
 	player.tasks[taskid] = { taskid = taskid , percent = percent , need = need ,finished = finished}
-	--log (dump(player))
 end
 
 function taskmgr:delete_task(taskid)
@@ -63,11 +62,9 @@ end
 -- 计算任务完成了多少
 function taskmgr:cal_task_status(taskid)
 	local details = self:get_task_details(taskid)
-	--log (dump(details))
 	local condition_type = details.needs_type
 	local param1 = details.needs_target
 	local param2 = details.needs_num
-	--log ("cal_task_status "..param1.." "..param2)
     local percent,need,finished = self:check_condition(condition_type,param1,param2)
 	return percent,need,finished
 end
@@ -86,8 +83,10 @@ function taskmgr:update_task(taskid)
 	local player = self.player
     if player.tasks[taskid] ~= nil then
         if player.tasks[taskid].percent ~= 100 then
-	        local percent = self:cal_task_status(taskid)
+	        local percent,need,finished = self:cal_task_status(taskid)
 		    player.tasks[taskid].percent = percent
+            player.tasks[taskid].need = need
+            player.tasks[taskid].finished = finished
         end
 	end 
 end
@@ -111,8 +110,9 @@ end
 
 function taskmgr:trigger_task(taskid)
     if self:have_finished_task(taskid) then
-            log ("i have finished task "..taskid )
-            return
+        return
+    elseif self:have_task(taskid) then
+        return
     else
 
         -- check if pre tasks are finished
@@ -120,7 +120,6 @@ function taskmgr:trigger_task(taskid)
         local pre = details.pre
 
         if pre then
-            log("pre "..pre)
             pre = string.split(pre,",")
             for i,v in pairs(pre) do
                 local pretask_id = tonumber(v)
@@ -192,7 +191,6 @@ function taskmgr:generate_tasks(save_tbl)
             need = v.need,
             finished = v.finished,
     	}
-        log (""..dump(task))
 
         table.insert(res,task)
     end
@@ -234,7 +232,6 @@ end
 
 
 function taskmgr:have_get_enough_level(level)
-	log("checking have get enough level")
     local percent = self.player.basic.level > level and 100 or 0
 	return percent,1,percent == 100 and 1 or 0
 end
@@ -329,7 +326,6 @@ function taskmgr:equip_resonances(level,count_need)
                 end
             end
         end
-        log ("min is ".. min)
         return min
     end
     

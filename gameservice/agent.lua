@@ -199,7 +199,6 @@ function REQUEST:login()
 	set_sync_redis_flag()
 
     log ("player "..self.playerid.." is initalized!","info")
-    log(dump(player))
 
     taskmgr:init(player)
     statmgr:init(player)
@@ -323,7 +322,6 @@ end
 
 function REQUEST:get_tasks()
 	if player.tasks ~= nil then
-        log ("get_tasks"..dump(taskmgr:generate_tasks(player.tasks)))
 		return { tasks = taskmgr:generate_tasks(player.tasks)}
 	else
 		print ("get_tasks_failed")
@@ -541,7 +539,7 @@ function REQUEST:lab_match_player()
 end
 
 function REQUEST:lab_steal()
-	return labmgr:lab_steal(self.playerid,self.result)
+	return labmgr:lab_steal(self.playerid,self.result,self.is_revenge)
 end
 
 function REQUEST:lab_harvest()
@@ -596,7 +594,7 @@ function REQUEST:get_guide_step()
 end
 
 function REQUEST:lab_start_steal()
-    return labmgr:lab_start_steal(self.playerid)
+    return labmgr:lab_start_steal(self.playerid,self.is_revenge)
 end
 
 function REQUEST:quick_pass_level()

@@ -40,7 +40,6 @@ end
 
 function arenamgr:get_fight_data(arena_type)
     local skynet = skynet
-    log ("arena_type is".. arena_type)
     local function gen_fd(playerid)
         local v = playerid
         local data = skynet.call("DATA_CENTER","lua","get_player_data",v)
@@ -122,6 +121,7 @@ function arenamgr:fight(enemyid,arena_type,result)
         statmgr:add_daily_stat(time_str) 
         taskmgr:update_tasks_by_condition_type(condition_type_time)
         taskmgr:update_tasks_by_condition_type(condition_type_daily)
+        log ("fight "..time_str)
          
         if result == 1 then
             local vic_str = arena_type == 1 and "arena_single_victory" or "arena_team_victory"
@@ -147,7 +147,7 @@ function arenamgr:start_fight(enemyid,arena_type)
     elseif arena_type == 2 then
         daily_times = statmgr:get_daily_stat("arena_team_times")
     end
-    if daily_times >= 5 then
+    if daily_times >= 10 then
         return { result = 0}
     end
 

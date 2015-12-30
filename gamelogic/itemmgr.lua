@@ -222,7 +222,6 @@ function itemmgr:use_gift_bag(itemtype)
         local gold = dm:getGold(drop_id)
         local diamond = dm:getDiamond(drop_id)
         local items_res = {}
-        log("heheda "..dump(items))
         for _,item in pairs(items) do
             local item_gen = self:add_item(item.dropid,item.dropNum)
             table.insert(items_res,item_gen)

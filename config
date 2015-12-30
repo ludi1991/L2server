@@ -1,7 +1,6 @@
 root = "./"
 thread = 8
-logger = "l2error"
-logger = nil 
+--logger = "l2error"
 logpath = "."
 harbor = 1
 address = "127.0.0.1:2526"

@@ -46,7 +46,7 @@ function command.KICK_PLAYER(playerid)
 end
 
 function command.SHUTDOWN()
-    local res = skynet.call("ONLINE_CENTER","lua","send_to_online_players","kick")
+   -- local res = skynet.call("ONLINE_CENTER","lua","send_to_online_players","kick")
     skynet.call("LAB_SERVICE","lua","save")
     skynet.call("ARENA_SERVICE","lua","save")
 end
