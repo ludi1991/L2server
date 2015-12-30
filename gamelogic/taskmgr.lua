@@ -62,11 +62,9 @@ end
 -- 计算任务完成了多少
 function taskmgr:cal_task_status(taskid)
 	local details = self:get_task_details(taskid)
-	--log (dump(details))
 	local condition_type = details.needs_type
 	local param1 = details.needs_target
 	local param2 = details.needs_num
-	--log ("cal_task_status "..param1.." "..param2)
     local percent,need,finished = self:check_condition(condition_type,param1,param2)
 	return percent,need,finished
 end
@@ -85,8 +83,10 @@ function taskmgr:update_task(taskid)
 	local player = self.player
     if player.tasks[taskid] ~= nil then
         if player.tasks[taskid].percent ~= 100 then
-	        local percent = self:cal_task_status(taskid)
+	        local percent,need,finished = self:cal_task_status(taskid)
 		    player.tasks[taskid].percent = percent
+            player.tasks[taskid].need = need
+            player.tasks[taskid].finished = finished
         end
 	end 
 end
@@ -110,7 +110,9 @@ end
 
 function taskmgr:trigger_task(taskid)
     if self:have_finished_task(taskid) then
-            return
+        return
+    elseif self:have_task(taskid) then
+        return
     else
 
         -- check if pre tasks are finished
@@ -189,7 +191,6 @@ function taskmgr:generate_tasks(save_tbl)
             need = v.need,
             finished = v.finished,
     	}
-        log (""..dump(task))
 
         table.insert(res,task)
     end
@@ -325,7 +326,6 @@ function taskmgr:equip_resonances(level,count_need)
                 end
             end
         end
-        log ("min is ".. min)
         return min
     end
     

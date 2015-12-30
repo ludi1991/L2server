@@ -322,7 +322,6 @@ end
 
 function REQUEST:get_tasks()
 	if player.tasks ~= nil then
-        log ("get_tasks"..dump(taskmgr:generate_tasks(player.tasks)))
 		return { tasks = taskmgr:generate_tasks(player.tasks)}
 	else
 		print ("get_tasks_failed")
