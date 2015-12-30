@@ -16,7 +16,7 @@ function global_CalculatePower(chara, skillList)
             end
         end
     end
-    return power
+    return math.floor(power)
 end
 
 --获得所有装备的属性综合值 参数传入为itemList， 包含装备id， 宝石镶嵌，强化等级等
@@ -90,6 +90,6 @@ function global_judgeGrade(equipids) --TOTAL_EQUIPMENT_POS件
             min = equipData[v].equip_quality
         end
     end
-    
+
     return min
 end
