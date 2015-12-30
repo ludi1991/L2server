@@ -1,6 +1,5 @@
 local equipManager = require "controller.equip_manager"
 
---根据力量敏捷等属性重新计算伤害命中暴击值
 function global_CalculatePower(chara, skillList)
     local power = 0
     if chara then
@@ -28,6 +27,7 @@ function global_CalEquipmentAddtion(itemList)
     
     if not itemList then return addtition_attributes end
 
+    --装备强化,宝石
     for i=1, #itemList do
         if itemList[i]~=nil then
             local equip = global_getEquipStrengthened(itemList[i])
@@ -48,6 +48,7 @@ function global_CalEquipmentAddtion(itemList)
             end
         end
     end
+
     return addtition_attributes
 end
 
@@ -55,41 +56,15 @@ end
 function global_getEquipStrengthened(itemvalue)
     local allequips_data = require "data.equipdata"
 
-    local strengthenTab = equipManager:getStrengthenTab()
     local equip = {}
     for i,v in pairs(allequips_data[itemvalue.item_entity_id]) do
         equip[i] = v
     end
-    
-    local addAttri = 0
-    for i = 1,  itemvalue.strengthenLv do
-        local curStrnData = strengthenTab[equip.equip_quality][i]
-        addAttri = addAttri + curStrnData.strengthen_attribute
-    end
-    
-    if equip.hp then
-        equip.hp = equip.hp + (addAttri or 0)
-    elseif equip.hit then
-        equip.hit = equip.hit + (addAttri or 0)
-    elseif equip.dodge then
-        equip.dodge = equip.dodge + (addAttri or 0)
-    elseif equip.damage then
-        equip.damage = equip.damage + (addAttri or 0)
-    elseif equip.defence then
-        equip.defence = equip.defence + (addAttri or 0)
-    elseif equip.critical then
-        equip.critical = equip.critical + (addAttri or 0)
-    elseif equip.toughness then
-        equip.toughness = equip.toughness + (addAttri or 0)
-    elseif equip.critouchness then
-        equip.critouchness = equip.critouchness + (addAttri or 0)
-    elseif equip.cridamageadd then
-        equip.cridamageadd = equip.cridamageadd + (addAttri or 0)
-    elseif equip.armorpenetration then
-        equip.armorpenetration = equip.armorpenetration + (addAttri or 0)
-    end
+  
+    --强化属性值
+    equip[equip.main_attribute] = equip[equip.main_attribute] + itemvalue.strengthenValue
 
-       --增加宝石属性
+    --增加宝石属性
     if itemvalue.gemsid then
         for k, gemid in pairs(itemvalue.gemsid) do
             if gemid~= -1 then
@@ -100,4 +75,21 @@ function global_getEquipStrengthened(itemvalue)
     end
 
     return equip
+end
+
+--通过装备id，判定套装阶级（可判定敌我）
+function global_judgeGrade(equipids) --TOTAL_EQUIPMENT_POS件
+    if equipids == nil or #equipids ~= TOTAL_EQUIPMENT_POS then return 0 end
+
+    local equipData = require "data.equipdata"
+
+    local min = TOTAL_QUALITY
+    for i,v in pairs(equipids) do
+        if v == -1 then return 0 end
+        if equipData[v].equip_quality < min then
+            min = equipData[v].equip_quality
+        end
+    end
+    
+    return min
 end

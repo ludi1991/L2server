@@ -160,7 +160,8 @@ function command.CREATE_PLAYER(nickname)
         arena_team_times = 0,
         arena_single_victory = 0,
         arena_team_victory = 0,
-        fight_power = { [1] = 77 , [2] = 25, [3] = 37,[4] = 55},
+       fight_power = { [1] = 0 , [2] = 0, [3] = 0,[4] = 0, [5] = 0 , [6] = 0, [7] = 0, [8] = 0,
+                                    [9] = 0, [10] = 0, [11] = 0, [12] = 0},                                       
         daily = {
             strengthen_equip = 0,
             upgrade_equip = 0,

@@ -70,7 +70,6 @@ function fp_calculator:get_soul_fightpower(player,soulid)
 	local playersoul = player["souls"]
 	local items = {}
 	local strInfo = equipManager:getStrengthenTab()
-        local pairs = pairs
 	for k,v in pairs(playersoul) do
 		if v.soul_girl_id == soulid then
 			for k1,v1 in pairs(v.itemids) do
@@ -82,10 +81,10 @@ function fp_calculator:get_soul_fightpower(player,soulid)
 					local quality = equipData[itemtmp.itemtype].equip_quality
 					local level   = itemtmp.itemextra%100
 					local value   = 0
-			        if strInfo[quality][level] then
-			            value = strInfo[quality][level].strengthen_attribute
-			            if equipData[itemtmp.itemtype].main_attribute == "hp" then value = value*10 end
-			        end
+					if strInfo[quality][level] then
+						value = strInfo[quality][level].strengthen_attribute
+						if equipData[itemtmp.itemtype].main_attribute == "hp" then value = value*10 end
+					end
 					items[itemtmp.itemid] = {itemid = itemtmp.itemid, itemtype = math.floor(itemtmp.itemtype/100000), item_entity_id = itemtmp.itemtype,
                            					equiped = true, strengthenLv = level, strengthenValue = value, number = itemtmp.itemcount}
 				end

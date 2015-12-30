@@ -92,7 +92,7 @@ end
 local function update_safe_tbl()
 	while true do
 		for playerid,_ in pairs(safe_tbl) do
-			log("safe_tbl,playerid "..playerid..", safe_time "..lab_data[playerid].safe_time)
+			--log("safe_tbl,playerid "..playerid..", safe_time "..lab_data[playerid].safe_time)
 			lab_data[playerid].safe_time = lab_data[playerid].safe_time - 1
 			if lab_data[playerid].safe_time <= 0 then
 				stop_protect_player(playerid)
@@ -112,7 +112,7 @@ end
 
 -- status -1 not open 0 empty  1 producing 2 full
 function command.REGISTER(playerid)
-	log("register!")
+--	log("register!")
 	if lab_data[playerid] == nil then
 		log("first one")
 		lab_data[playerid] = 
@@ -197,7 +197,7 @@ function command.START_HOURGLASS(playerid,glassid,sandtype)
 end
 
 function command.HELP_FRIEND(playerid,targetid,glassid,unique_id)
-	log ("help friend"..playerid.." "..targetid.." "..glassid.." "..unique_id)
+	--log ("help friend"..playerid.." "..targetid.." "..glassid.." "..unique_id)
 	local hg = lab_data[targetid].hourglass[glassid]
 	if hg.status ~= GLASS_PRODUCING then
 		return false
@@ -239,7 +239,7 @@ end
 
 function command.START_STEAL(targetid)
 	if is_safe(targetid) then
-		log("start_steal false")
+	--	log("start_steal false")
 		return false
 	else
 		local res,agent = skynet.call("ONLINE_CENTER","lua","is_online",targetid)
@@ -247,14 +247,14 @@ function command.START_STEAL(targetid)
 			pcall(skynet.call,agent,"lua","lab_stolen")
 		end
 		protect_player(targetid)
-		log("start_steal true")
+	--	log("start_steal true")
 		return true
 	end
 end
 
 
 function command.STEAL(playerid,targetid,result)
-	log("steal!"..playerid.." "..targetid.." "..result)
+	--log("steal!"..playerid.." "..targetid.." "..result)
 	
 	local player_data = lab_data[playerid]
 	local target_data = lab_data[targetid]
@@ -294,7 +294,7 @@ function command.STEAL(playerid,targetid,result)
 		pcall(skynet.call,agent,"lua","lab_stolen")
 	end
 
-    log(""..playerid.."success steal "..targetid.."for "..gold_steal_total)
+  --  log(""..playerid.."success steal "..targetid.."for "..gold_steal_total)
 
 	return true,gold_steal_total
 
@@ -303,7 +303,7 @@ end
 
 
 function command.HARVEST(playerid,glassid)
-	log ("harvest"..playerid.." "..glassid)
+	--log ("harvest"..playerid.." "..glassid)
 	--log ("glass"..dump(lab_data[playerid].hourglass[glassid]))
 	if lab_data[playerid].hourglass[glassid].status == GLASS_FULL then
         local hourglass = lab_data[playerid].hourglass[glassid]
@@ -323,7 +323,7 @@ function command.HARVEST(playerid,glassid)
 end
 
 function command.QUICK_HARVEST(playerid,glassid)
-	log ("quick harvest"..playerid.." "..glassid)
+--	log ("quick harvest"..playerid.." "..glassid)
 	--log ("glass"..dump(lab_data[playerid].hourglass[glassid]))
 	if lab_data[playerid].hourglass[glassid].status == GLASS_PRODUCING then
 		local hourglass = lab_data[playerid].hourglass[glassid]
@@ -350,7 +350,7 @@ function command.GET_DATA(playerid)
         local ids = {}
         for id,_ in pairs(souls) do table.insert(ids,id) end
 		local items = skynet.call("DATA_CENTER","lua","generate_soul_items",playerid,ids)
-        log ("heheda")
+    --    log ("heheda")
 		return true, { lab_data = lab_data[playerid] , fight_data = { souls = souls , items = items}}
 	else
 		return false
@@ -366,7 +366,7 @@ function command.GET_QUICK_DIAMOND_NEED(playerid,pos)
         local totaltime = TIME_TBL[hg.sandtype]
         local time_need = totaltime - curtime
         local diamond_need = math.ceil(time_need / 360)
-        log("quick_diamond_need "..diamond_need)
+     --   log("quick_diamond_need "..diamond_need)
         return true,diamond_need
     end
 end
@@ -386,7 +386,7 @@ function command.SET_KEEPER(playerid,keeper)
 end
 
 function command.UNLOCK_HOURGLASS(playerid,glassid)
-	log("unlock_hourglass"..playerid.." "..glassid)
+--	log("unlock_hourglass"..playerid.." "..glassid)
 	if lab_data[playerid] and lab_data[playerid].hourglass[glassid].status == GLASS_CLOSED then
 		lab_data[playerid].hourglass[glassid].status = GLASS_EMPTY
 		log ("ok")
@@ -398,8 +398,8 @@ end
 
 function command.SAVE(savepath)
     savepath = savepath or "../service_save/lab_data.lua"
-    log("afsadfasdf"..dump(savepath))
-    log("save_lab_service")
+ --   log("afsadfasdf"..dump(savepath))
+ --   log("save_lab_service")
     local fd = io.open(savepath,"w+")
     local str = dump(
     {
