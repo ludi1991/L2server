@@ -650,7 +650,7 @@ function REQUEST:set_nickname()
 end
 
 function REQUEST:hand_of_midas()
-    local data = require "handofmidas"
+    local data = require "data.handofmidas_data"
     local cur =  statmgr:get_daily_stat("hand_of_midas")
     local next_data = data[cur+1]
     if next_data then
@@ -662,6 +662,7 @@ function REQUEST:hand_of_midas()
                 gold = gold * 2
             end
             add_gold(gold)
+            statmgr:add_daily_stat("hand_of_midas")
             statmgr:add_stat("hand_of_midas")
             return { result = 1, gold = gold , double = isdouble , diamond_consumed = next_data.costdiamond}
         else
@@ -673,8 +674,8 @@ function REQUEST:hand_of_midas()
 end
 
 
-function REQUEST:get_daily_midas_time()
-    return statmgr:get_daily_stat("hand_of_midas")
+function REQUEST:get_daily_midas_times()
+    return { result = statmgr:get_daily_stat("hand_of_midas") }
 end
 
 function REQUEST:get_arena_daily_times()
