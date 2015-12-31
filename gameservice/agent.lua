@@ -857,7 +857,7 @@ function CMD.start(conf)
 			send_package(send_request("heartbeat",nil,5))
             heartbeat_miss_cnt = heartbeat_miss_cnt + 1
             if heartbeat_miss_cnt >= 8 then
-                log("client missed!")
+                -- log("client missed!")
             end
 			skynet.sleep(200)
 		end
