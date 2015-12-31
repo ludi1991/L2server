@@ -47,6 +47,7 @@ function taskmgr:add_task(taskid)
 	local player = self.player
 	local percent,need,finished = taskmgr:cal_task_status(taskid)
 	player.tasks[taskid] = { taskid = taskid , percent = percent , need = need ,finished = finished}
+   -- self:call_client()
 end
 
 function taskmgr:delete_task(taskid)
@@ -59,6 +60,16 @@ function taskmgr:have_task(taskid)
     return self.player.tasks[taskid] ~= nil
 end
 
+--是否有还未领取但是已经完成的任务
+function taskmgr:have_unrewarded_task()
+    for i,v in pairs(self.player.tasks) do
+        if v.percent == 100 then
+            return true
+        end
+    end
+    return false
+end
+
 -- 计算任务完成了多少
 function taskmgr:cal_task_status(taskid)
 	local details = self:get_task_details(taskid)
@@ -69,14 +80,27 @@ function taskmgr:cal_task_status(taskid)
 	return percent,need,finished
 end
 
+-- tell client that there are tasks
+function taskmgr:call_client()
+    local res,agent = skynet.call("ONLINE_CENTER","lua","is_online",self.player.basic.playerid)
+    if res then
+        local res,data = pcall(skynet.call, agent, "lua", "alert_task")
+    end
+end
+
 -- 更新任务
 function taskmgr:update_tasks_by_condition_type(condition_type)
+    local new_finish = false
     for i,v in pairs(self.player.tasks) do
     	local detail = self:get_task_details(v.taskid)
     	if detail.needs_type == condition_type then
-    		self:update_task(v.taskid)
+    	    local finish = self:update_task(v.taskid)
+            if finish then new_finish = finish end
     	end
     end
+    if new_finish then
+        self:call_client()
+    end  
 end
 
 function taskmgr:update_task(taskid)
@@ -87,6 +111,9 @@ function taskmgr:update_task(taskid)
 		    player.tasks[taskid].percent = percent
             player.tasks[taskid].need = need
             player.tasks[taskid].finished = finished
+            if percent == 100 then
+                return true
+            end
         end
 	end 
 end
@@ -196,8 +223,6 @@ function taskmgr:generate_tasks(save_tbl)
     end
     return res
 end
-
-
 
 
 function taskmgr:check_condition(type,...)

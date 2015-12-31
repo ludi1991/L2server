@@ -224,10 +224,16 @@ function REQUEST:login()
 
     skynet.call("ONLINE_CENTER","lua","set_online",self.playerid,skynet.self())
     
+    
     -- update data at 5 o'clock
     if need_update() then
         log("need daily update")
         CMD.daily_update()
+    end
+
+    if taskmgr:have_unrewarded_task() then
+        CMD.alert_task()
+        log ("alert task")
     end
 
 	return { result = 1 }
@@ -730,6 +736,16 @@ function REQUEST:use_gift_bag()
 end
 
 
+function REQUEST:get_spell_config()
+    return { config = player.config.spell_config }
+end
+
+function REQUEST:set_spell_config()
+    player.config.spell_config = self.config
+    return { result = 1}
+end
+
+
 function REQUEST:quit()
 	save_to_db()
 	skynet.call(WATCHDOG, "lua", "close", client_fd)
@@ -805,6 +821,11 @@ end
 function CMD.get_data()
 	return player
 end
+
+function CMD.alert_task()
+    send_package(send_request("alert_task"))
+end
+   
 
 function CMD.daily_update()
     statmgr:reset_daily_stat()

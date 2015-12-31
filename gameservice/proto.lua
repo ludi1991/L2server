@@ -780,6 +780,20 @@ get_arena_daily_times 74 {
     }
 }
 
+get_spell_config 75 {
+    response {
+        config 0 : integer
+    }
+}
+
+set_spell_config 76 {
+    request {
+        config 0 : integer
+    }
+    response {
+        result 0 : integer #1--success 0--fail
+    }
+}
 
 
 ]]
@@ -826,11 +840,7 @@ chatting 2 {
 }
 
 #更新任务
-update_task 3 {
-    request {
-        task 0: task
-    }   
-}
+alert_task 3 {}
 
 lab_friend_helped 4 {}
 
