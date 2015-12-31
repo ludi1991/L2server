@@ -224,11 +224,20 @@ function command.HELP_FRIEND(playerid,targetid,glassid,unique_id)
 end
 
 function command.MATCH_PLAYER(level)
-    local lower = (level - 10) * 25
-    if lower < 1 then lower = 1 end
-    local upper = level * 25
-    if upper > 1000 then upper = 1000 end
-	local playerid = 1000000+1001-math.random(lower,upper)
+    local lower = { [1] = 1,[2] = 1,[3] =1 ,[4] = 1,[5] = 1,[6] = 201 }
+    local upper = { [41] = 1000 , [42] = 1000, [43] = 1000,[44] = 1000,[45] = 1000}
+    for i=6,100 do
+        lower[i] = 80 + i*20 
+    end
+    for i=1,40 do
+        upper[i] = 180 + i*20
+    end
+    for i=41,100 do
+        upper[i] = 1000
+    end
+
+
+	local playerid = 1000000+1001-math.random(lower[level],upper[level])
     local basic = skynet.call("DATA_CENTER","lua","get_player_data_part",playerid,"basic")
 	return {
         result = 1,
@@ -423,7 +432,6 @@ function command.UNLOCK_HOURGLASS(playerid,glassid)
 --	log("unlock_hourglass"..playerid.." "..glassid)
 	if lab_data[playerid] and lab_data[playerid].hourglass[glassid].status == GLASS_CLOSED then
 		lab_data[playerid].hourglass[glassid].status = GLASS_EMPTY
-		log ("ok")
 		return true
 	else
 		return false
