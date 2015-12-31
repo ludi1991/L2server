@@ -224,10 +224,10 @@ function command.HELP_FRIEND(playerid,targetid,glassid,unique_id)
 end
 
 function command.MATCH_PLAYER(level)
-    local lower = { [1] = 1,[2] = 1,[3] =1 ,[4] = 1,[5] = 1,[6] = 201 }
+    local lower = { [1] = 1,[2] = 1,[3] =1 ,[4] = 1,[5] = 1,[6] = 1,[7] = 1,[8] =1,[9] =1,[10] =1,[11] = 201 }
     local upper = { [41] = 1000 , [42] = 1000, [43] = 1000,[44] = 1000,[45] = 1000}
-    for i=6,100 do
-        lower[i] = 80 + i*20 
+    for i=11,100 do
+        lower[i] = -21 + i*20 
     end
     for i=1,40 do
         upper[i] = 180 + i*20

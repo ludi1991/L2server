@@ -20,11 +20,28 @@ local namegen = require "gamelogic.name_generator.namegen"
 
 
 
-local function gen_robots(count, level)
+local function gen_robots(count)
+    local curlevel = 6
+    local tmpcnt = 0
     for i=1,count do
         -- local level = math.floor((1000-i+1)/25+5)
         -- local factor = 0.8-0.8*i/1000
+        local level
+       
+        if i<= 200 then 
+            level = 5
+        elseif i >= 200 then
+            level = curlevel
+            tmpcnt = tmpcnt + 1
+            if tmpcnt >= 20 then
+                tmpcnt = 0
+                curlevel = curlevel + 1
+            end
+        end
+        
+        local i = 1001 - i
         local factor = (level-5)*0.02
+
        -- local factor = 0.8
         robot_data[1000000+i] = npcgen:GenerateNpc(level,factor,1000000+i,namegen:GenerateName(math.random(1,2) == 1))
 
@@ -288,9 +305,6 @@ skynet.start(function()
 			error(string.format("Unknown command %s", tostring(cmd)))
 		end
 	end)
-    gen_robots(200, 5)
-    for level = 6,45 do
-        gen_robots(20, i)
-    end
+    gen_robots(ROBOT_NEED)
 	skynet.register "DATA_CENTER"
 end)
