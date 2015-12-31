@@ -64,9 +64,12 @@ end
 function taskmgr:have_unrewarded_task()
     for i,v in pairs(self.player.tasks) do
         if v.percent == 100 then
+            log("unrewarded true")
             return true
         end
     end
+    log("unrewarded false")
+
     return false
 end
 

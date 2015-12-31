@@ -22,6 +22,7 @@ lua_path = "./lualib/?.lua;./lualib/?/init.lua;../common/?.lua;../gamelogic/lua_
 redis_addr = "127.0.0.1"
 redis_port = 6379
 
+--need_activation_key = 1
 
 mysql_host = "121.40.241.223"
 mysql_port = 3306

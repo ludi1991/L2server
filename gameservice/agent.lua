@@ -681,6 +681,7 @@ end
 
 
 function REQUEST:get_daily_midas_times()
+    log("aaaa????")
     return { result = statmgr:get_daily_stat("hand_of_midas") }
 end
 
@@ -706,6 +707,14 @@ local function save_to_db()
 end
 
 function REQUEST:create_new_player()
+    local need_activation_key = skynet.getenv("need_activation_key")
+    if need_activation_key ~= nil then
+        local key = self.activation_key
+        if not key then return { result = -1 } end
+        local res = skynet.call("ACT_SERVICE","lua","use",key)
+        if not res then return { result = -2 } end
+    end
+
     local newplayerid
     newplayerid,player = skynet.call("DATA_CENTER","lua","create_player",self.nickname)
 
@@ -811,11 +820,11 @@ function CMD.chat(themsg)
 end
 
 function CMD.lab_friend_helped()
-    send_package(send_request("lab_friend_helped"))
+    send_package(send_request("lab_friend_helped",nil,5))
 end
 
 function CMD.lab_stolen()
-	send_package(send_request("lab_stolen"))
+	send_package(send_request("lab_stolen",nil,5))
 end
 
 function CMD.get_data()
@@ -823,7 +832,8 @@ function CMD.get_data()
 end
 
 function CMD.alert_task()
-    send_package(send_request("alert_task"))
+    log ("alert task")
+    send_package(send_request("alert_task",nil,5))
 end
    
 

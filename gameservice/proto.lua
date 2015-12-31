@@ -267,9 +267,10 @@ get_tasks 16 {
 create_new_player 17 {
     request { 
         nickname 0: string
+        activation_key 1 : string
     }
     response {
-        result 0 : integer #1成功0失败
+        result 0 : integer #1成功 0失败 -1没有key -2key不合法
         playerid 1 : integer
     }
 }
