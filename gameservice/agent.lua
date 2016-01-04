@@ -875,12 +875,11 @@ function CMD.disconnect()
         log("disconnect "..player.basic.playerid)
         player.basic.last_login_time = os.date("%Y-%m-%d %X")
         save_to_db()
+        skynet.call("ONLINE_CENTER","lua","set_offline",player.basic.playerid)
        
     else
         log("disconnect there is no player")
     end
-
-     skynet.call("ONLINE_CENTER","lua","set_offline",player.basic.playerid)
 
 	skynet.exit()
 end
