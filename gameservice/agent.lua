@@ -688,8 +688,48 @@ end
 function REQUEST:get_arena_daily_times()
     local single = statmgr:get_daily_stat("arena_single_times")
     local team = statmgr:get_daily_stat("arena_team_times")
-    return { single = single , team = team }
+    local single_last_fight_time = statmgr:get_daily_stat("arena_single_last_fight_time")
+    local team_last_fight_time = statmgr:get_daily_stat("arena_team_last_fight_time")
+    local single_times_buy_count = statmgr:get_daily_stat("arena_single_times_buy_count")
+    local team_times_buy_count = statmgr:get_daily_stat("arena_team_times_buy_count")
+    return { single = single , team = team, 
+                single_last_fight_time = single_last_fight_time, team_last_fight_time = team_last_fight_time, 
+                single_times_buy_count = single_times_buy_count, team_times_buy_count = team_times_buy_count}
 
+end
+
+function REQUEST:arena_clear_time()
+    if not add_diamond(-5) then return { result = 2 } end
+
+    if self.arena_type == 1 then
+        statmgr:set_daily_stat("arena_single_last_fight_time",0)
+    elseif self.arena_type == 2 then
+        statmgr:set_daily_stat("arena_team_last_fight_time",0)
+    else
+        return { result = 0 }
+    end
+
+    return { result = 1 }
+end
+
+function REQUEST:arena_buy_times()
+    if not add_diamond(-20) then return { result = 2 } end
+
+    if statmgr:get_daily_stat("arena_team_times_buy_count") >= 1 then return { result = 3 } end
+
+    if self.arena_type == 1 then
+        statmgr:set_daily_stat("arena_single_times",0)
+        statmgr:set_daily_stat("arena_single_last_fight_time",0)
+        statmgr:set_daily_stat("arena_single_times_buy_count",statmgr:get_daily_stat("arena_single_times_buy_count")+1)
+    elseif self.arena_type == 2 then
+        statmgr:set_daily_stat("arena_team_times",0)
+        statmgr:set_daily_stat("arena_team_last_fight_time",0)
+        statmgr:set_daily_stat("arena_team_times_buy_count",statmgr:get_daily_stat("arena_team_times_buy_count")+1)
+    else
+        return { result = 0 }
+    end
+
+    return { result = 1 }
 end
 
 function REQUEST:get_shop_data()

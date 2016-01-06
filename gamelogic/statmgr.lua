@@ -89,8 +89,8 @@ end
 
 function statmgr:reset_daily_stat()
 	for i,_ in pairs(self.stat.daily) do
-        self.stat.daily[i] = 0
-    end
+		self.stat.daily[i] = 0
+	end
 end
 
 return statmgr

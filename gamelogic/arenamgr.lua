@@ -134,6 +134,11 @@ function arenamgr:fight(enemyid,arena_type,result)
             taskmgr:update_tasks_by_condition_type(con_type_vic_time)
             taskmgr:update_tasks_by_condition_type(con_type_rank)
         end
+        if arena_type == 1 then
+            statmgr:set_daily_stat("arena_single_last_fight_time", os.date("%Y-%m-%d %X"))
+        else
+            statmgr:set_daily_stat("arena_team_last_fight_time", os.date("%Y-%m-%d %X"))
+        end
         return { result = 1 }
     else
         return { result = 0 }
@@ -147,7 +152,7 @@ function arenamgr:start_fight(enemyid,arena_type)
     elseif arena_type == 2 then
         daily_times = statmgr:get_daily_stat("arena_team_times")
     end
-    if daily_times >= 10 then
+    if daily_times >= 5 then
         return { result = 0}
     end
 

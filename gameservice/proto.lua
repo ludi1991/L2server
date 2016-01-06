@@ -778,6 +778,10 @@ get_arena_daily_times 74 {
     response {
         single 0 : integer
         team 1 : integer
+        single_last_fight_time 2 : string #上次战斗时间
+        team_last_fight_time 3 : string
+        single_times_buy_count 4 : integer #购买挑战次数计数
+        team_times_buy_count 5 : integer
     }
 }
 
@@ -796,6 +800,25 @@ set_spell_config 76 {
     }
 }
 
+#竞技场挑战时间清零
+arena_clear_time 77 {
+    request {
+        arena_type 0 : integer #1-single, 2-team
+    }
+    response {
+        result 0 : integer #0--fail, 1--success, 2-钻石不足
+    }
+}
+
+#购买挑战次数
+arena_buy_times 78 {
+    request {
+        arena_type 0 : integer #1-single, 2-team
+    }
+    response {
+        result 0 : integer #1--success, 0--fail, 2-钻石不足, 3-购买次数不足
+    }
+}
 
 ]]
 
