@@ -115,8 +115,9 @@ skynet.start(function()
         agent[i] = skynet.newservice(SERVICE_NAME, "agent")
     end
     local balance = 1
-    local id = socket.listen("0.0.0.0", 8001)
-    skynet.error("Listen web port 8001")
+    local port = skynet.getenv("http_console_port")
+    local id = socket.listen("0.0.0.0", port)
+    skynet.error("http console strat,port "..port)
     socket.start(id , function(id, addr)
         skynet.error(string.format("%s connected, pass it to agent :%08x", addr, agent[balance]))
         skynet.send(agent[balance], "lua", id)

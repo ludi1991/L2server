@@ -26,6 +26,12 @@ local player = {}
 
 local redis_need_sync = false
 
+local AGENT_CONNECTED = 1
+local AGENT_WORKING = 2
+local AGENT_NOT_CONNECTED = 3
+
+local agent_status = AGENT_NOT_CONNECTED
+
 
 
 local function send_package(pack)
@@ -194,7 +200,7 @@ end
 function REQUEST:login()
 
     player = skynet.call("DATA_CENTER","lua","get_player_data",self.playerid)
-
+    if not player then return { result = 0 } end
 
 	set_sync_redis_flag()
 
@@ -763,7 +769,7 @@ function REQUEST:create_new_player()
     statmgr:init(player)
     itemmgr:init(player)
     labmgr:init(player)
-    friendmgr:init(playeragent)
+    friendmgr:init(player)
     arenamgr:init(player)
     rankmgr:init(player)
     shopmgr:init(player)
@@ -818,7 +824,7 @@ local function dispatch_with_queue(_,_,type,...)
 	if type == "REQUEST" then
         cs(send_package,request(...))
 	else
-        --log("receive heartbeat callback")
+        log("receive heartbeat callback")
 		heartbeat_miss_cnt = 0
 	end
 end
@@ -882,6 +888,9 @@ function CMD.daily_update()
     taskmgr:daily_task_update()
 end
 
+
+local heartbeat_cur_session = 1
+
 function CMD.start(conf)
 	local fd = conf.client
 	local gate = conf.gate
@@ -891,13 +900,15 @@ function CMD.start(conf)
 	send_request = host:attach(sprotoloader.load(2))
 	log("start","info")
 
-
+    
 	skynet.fork(function()
 		while true do
-			send_package(send_request("heartbeat",nil,5))
+			send_package(send_request("heartbeat",nil,heartbeat_cur_session))
             heartbeat_miss_cnt = heartbeat_miss_cnt + 1
+            heartbeat_cur_session = heartbeat_cur_session + 1
             if heartbeat_miss_cnt >= 8 then
-                -- log("client missed!")
+                log("client missed! close agent")
+                skynet.call(WATCHDOG,"lua","close",client_fd)
             end
 			skynet.sleep(200)
 		end

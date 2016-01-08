@@ -7,12 +7,11 @@ skynet.start(function()
 	print("Server start")
 	skynet.uniqueservice("protoloader")
 	local console = skynet.newservice("console")
-	skynet.newservice("debug_console",8000)
+	skynet.newservice("debug_console",skynet.getenv("debug_console_port"))
 	skynet.newservice("simplenews")
 	skynet.newservice("chatroom")
 	skynet.newservice("mysql_service")
 --	skynet.newservice("redis_service")
---	skynet.newservice("robot")
 	skynet.newservice("player_data_center")
 	skynet.newservice("online_center")
 	skynet.newservice("rank_service")
@@ -25,11 +24,11 @@ skynet.start(function()
 
 	local watchdog = skynet.newservice("watchdog")
 	skynet.call(watchdog, "lua", "start", {
-		port = 8888,
+		port = skynet.getenv("watchdog_port"),
 		maxclient = max_client,
 		nodelay = true,
 	})
-	print("Watchdog listen on ", 8888)
+	print("Watchdog listen on ", skynet.getenv("watchdog_port"))
 
 	skynet.exit()
 end)
