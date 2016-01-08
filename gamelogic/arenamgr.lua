@@ -153,7 +153,7 @@ function arenamgr:start_fight(enemyid,arena_type)
         daily_times = statmgr:get_daily_stat("arena_team_times")
     end
     if daily_times >= 5 then
-        return { result = 0}
+        return { result = -1}
     end
 
     local res = skynet.call("ARENA_SERVICE","lua","start_fight",self.player.basic.playerid,enemyid,arena_type)
