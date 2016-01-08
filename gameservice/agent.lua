@@ -909,6 +909,7 @@ function CMD.start(conf)
             if heartbeat_miss_cnt >= 8 then
                 log("client missed! close agent")
                 skynet.call(WATCHDOG,"lua","close",client_fd)
+                return
             end
 			skynet.sleep(200)
 		end
