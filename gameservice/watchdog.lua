@@ -15,10 +15,13 @@ end
 
 local function close_agent(fd)
 	local a = agent[fd]
+	log ("close_agent 1")
 	agent[fd] = nil
 	if a then
+		log ("close_agent 2")
 		skynet.call(gate, "lua", "kick", fd)
 		-- disconnect never return
+		skynet.call(a, "lua", "setoffline")
 		skynet.send(a, "lua", "disconnect")
 	end
 end

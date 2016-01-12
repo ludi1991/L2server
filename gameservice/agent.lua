@@ -33,10 +33,11 @@ local AGENT_NOT_CONNECTED = 3
 local agent_status = AGENT_NOT_CONNECTED
 
 
-
+local send_session_id = 0
 local function send_package(pack)
 	local package = string.pack(">s2", pack)
 	socket.write(client_fd, package)
+    send_session_id = send_session_id + 1
 end
 
 
@@ -198,7 +199,12 @@ function REQUEST:get_player_rank()
 end
 
 function REQUEST:login()
-
+    
+    local res,agent,fd = skynet.call("ONLINE_CENTER","lua","is_online",self.playerid)
+    if res then
+        log("player "..self.playerid.." is online , kick the old one")
+        skynet.call(WATCHDOG, "lua", "close",fd )
+    end
     player = skynet.call("DATA_CENTER","lua","get_player_data",self.playerid)
     if not player then return { result = 0 } end
 
@@ -217,10 +223,9 @@ function REQUEST:login()
 
 
     skynet.fork(function()
-        log("hello")
 		while true do
 			if redis_need_sync then
-				log ("sync data to redis!")
+				--log ("sync data to redis!")
 				sync_fight_data_to_redis()
 			    redis_need_sync = false
 			end
@@ -228,7 +233,9 @@ function REQUEST:login()
 		end
     end)
 
-    skynet.call("ONLINE_CENTER","lua","set_online",self.playerid,skynet.self())
+    log("try set online "..skynet.self())
+    skynet.call("ONLINE_CENTER","lua","set_online",self.playerid,skynet.self(),client_fd)
+    log("try set online success"..skynet.self())
     
     
     -- update data at 5 o'clock
@@ -596,7 +603,7 @@ end
 
 
 function REQUEST:set_guide_step()
-	log ("set guide step "..self.step)
+--	log ("set guide step "..self.step)
     player.config.guide_step = self.step
     return { result = 1 }
 end
@@ -687,7 +694,6 @@ end
 
 
 function REQUEST:get_daily_midas_times()
-    log("aaaa????")
     return { result = statmgr:get_daily_stat("hand_of_midas") }
 end
 
@@ -824,7 +830,7 @@ local function dispatch_with_queue(_,_,type,...)
 	if type == "REQUEST" then
         cs(send_package,request(...))
 	else
-        log("receive heartbeat callback")
+     --   log("receive heartbeat callback")
 		heartbeat_miss_cnt = 0
 	end
 end
@@ -866,11 +872,11 @@ function CMD.chat(themsg)
 end
 
 function CMD.lab_friend_helped()
-    send_package(send_request("lab_friend_helped",nil,5))
+    send_package(send_request("lab_friend_helped",nil,send_session_id))
 end
 
 function CMD.lab_stolen()
-	send_package(send_request("lab_stolen",nil,5))
+	send_package(send_request("lab_stolen",nil,send_session_id))
 end
 
 function CMD.get_data()
@@ -879,9 +885,8 @@ end
 
 function CMD.alert_task()
     log ("alert task")
-    send_package(send_request("alert_task",nil,5))
+    send_package(send_request("alert_task",nil,send_session_id))
 end
-   
 
 function CMD.daily_update()
     statmgr:reset_daily_stat()
@@ -889,7 +894,6 @@ function CMD.daily_update()
 end
 
 
-local heartbeat_cur_session = 1
 
 function CMD.start(conf)
 	local fd = conf.client
@@ -903,9 +907,8 @@ function CMD.start(conf)
     
 	skynet.fork(function()
 		while true do
-			send_package(send_request("heartbeat",nil,heartbeat_cur_session))
+			send_package(send_request("heartbeat",nil,send_session_id))
             heartbeat_miss_cnt = heartbeat_miss_cnt + 1
-            heartbeat_cur_session = heartbeat_cur_session + 1
             if heartbeat_miss_cnt >= 8 then
                 log("client missed! close agent")
                 skynet.call(WATCHDOG,"lua","close",client_fd)
@@ -919,19 +922,21 @@ function CMD.start(conf)
 	skynet.call(gate, "lua", "forward", fd)
 end
 
-
-function CMD.disconnect()
-	-- todo: do something before exit
-    --skynet.send("CHATROOM","lua","logout",skynet.self())
+function CMD.setoffline()
     if player and player.basic then
         log("disconnect "..player.basic.playerid)
         player.basic.last_login_time = os.date("%Y-%m-%d %X")
         save_to_db()
-        skynet.call("ONLINE_CENTER","lua","set_offline",player.basic.playerid)
-       
+        skynet.call("ONLINE_CENTER","lua","set_offline",player.basic.playerid)     
     else
         log("disconnect there is no player")
     end
+end
+
+function CMD.disconnect()
+	-- todo: do something before exit
+    --skynet.send("CHATROOM","lua","logout",skynet.self())
+   
 
 	skynet.exit()
 end

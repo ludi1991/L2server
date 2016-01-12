@@ -10,9 +10,9 @@ function command.GET_ONLINE_PLAYERS_COUNT()
 	return count
 end
 
-function command.SET_ONLINE(playerid, agent)
+function command.SET_ONLINE(playerid, agent , fd)
 	if online_players[playerid] == nil then
-		online_players[playerid] = agent
+		online_players[playerid] = { agent = agent , fd = fd }
 		count = count +1
 		log("player "..playerid.." is online ,total online count : "..count)
 	end
@@ -28,7 +28,7 @@ end
 
 function command.IS_ONLINE(playerid)
 	if online_players[playerid] ~= nil then
-		return true,online_players[playerid]
+		return true,online_players[playerid].agent,online_players[playerid].fd
     else 
     	return false
     end
@@ -38,7 +38,7 @@ function command.SEND_TO_ONLINE_PLAYERS(command,...)
 	local cnt = 0
 	log("command is "..command)
 	for i,v in pairs(online_players) do
-		local res,data = pcall(skynet.call, v, "lua", command,...)
+		local res,data = pcall(skynet.call, v.agent, "lua", command,...)
 	    cnt = cnt + 1
 	end
 	return cnt
