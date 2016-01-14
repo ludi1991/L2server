@@ -74,7 +74,7 @@ function NpcGen:selectUpgrades(level, iq, souls, items)
 
 
 	-- start random
-	math.randomseed(tostring(os.time()):reverse():sub(1, 6))
+	--math.randomseed(tostring(os.time()):reverse():sub(1, 6))
 
 	while upgradableItemCount > 0  and  upgradePoints > 0 do
 		local index = math.random(upgradableItemCount)  -- get a random number in range [1, upgradableItemCount]
