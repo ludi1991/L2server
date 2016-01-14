@@ -7,12 +7,19 @@ proto.c2s = sprotoparser.parse [[
     session 1 : integer
 }
 
+.enchant_data {     #附魔属性
+        key 0 : string  #属性名称
+        value 1 : integer   #属性值
+}
+
 .item {          #物品
     itemid 0 : integer      #物品id,对应格子
     itemtype 1 : integer    #物品类型
     itemextra 2: integer    #物品的额外属性
     itemcount 3: integer    #物品的数量
-    gem_id 4 : *integer # 宝石的ids 
+    gem_id 4 : *integer     #宝石的ids 
+    enchant_attrs 5 : *enchant_data     #附魔属性
+    refine_times 6 : integer #洗练次数
 }
 
 .player_basic {    #玩家基础数据
@@ -821,6 +828,49 @@ arena_buy_times 78 {
     }
 }
 
+#附魔(不替换)
+enchant_item 79 {
+    request {
+        itemid 0 : integer
+    }
+    response {
+        result 0 : integer #1-success, 2-金币不足, 3-材料不足, 4-装备存在
+        enchant_attrs 1 : *enchant_data
+    }
+}
+
+#附魔替换
+enchant_item_apply 80 {
+    request {
+        itemid 0 : integer
+        enchant_attrs 1 : *enchant_data
+    }
+    response {
+        result 0 : integer #1-success, 2-装备不存在
+    }
+}
+
+#洗练
+refine_item 81 {
+    request {
+        itemid 0 : integer
+    }
+    response {
+        result 0 : integer #1-success, 2-金币不足, 3-装备未附魔, 4-装备不存在
+        attributes 1 : *integer #洗练得到的3个属性变化值
+    }
+}
+
+#洗练替换
+refine_item_apply 82 {
+    request {
+        itemid 0 : integer
+        attributes 1 : *integer
+    }
+    response {
+        result 0 : integer #1-success, 2-装备未附魔, 3-装备不存在
+    }
+}
 ]]
 
 proto.s2c = sprotoparser.parse [[

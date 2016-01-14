@@ -200,9 +200,9 @@ end
 
 function itemmgr:add_stone(value)
 	if value >= 0 then
-		self:add_item(1000001)
+		self:add_item(1000001,value)
 	else
-		self:delete_item(1000001)
+		self:delete_item(1000001,-value)
 	end
 	return true
 end
@@ -238,12 +238,97 @@ function itemmgr:use_gift_bag(itemtype)
     end
 end
 
+function itemmgr:enchant(itemid)
+    if itemmgr:have_item(itemid) then
+        local need_gold = 1000
+        local need_dust = 10
+        if self.player.basic.gold >= need_gold then
+            if itemmgr:have_item(1700001, need_dust) then
+                local attr_string = {"hp", "damage", "armorpenetration", "defence", "hit", "dodge", "critical", "toughness"}
+                local enchant_attrs = {}
+                for i=1,3 do
+                    local key = math.random(1,#attr_string)
+                    enchant_attrs[i] = {}
+                    enchant_attrs[i].key = attr_string[key]
+                    local value = 300
+                    if self.items[itemid].enchant_attrs then
+                        value = self.items[itemid].enchant_attrs[i].value
+                        if self.items[itemid].enchant_attrs[i].key == "hp" then
+                            value = value/10
+                        end
+                    end
+                    if attr_string[key] == "hp" then
+                        enchant_attrs[i].value = value*10
+                    else
+                        enchant_attrs[i].value = value
+                    end
+                    table.remove(attr_string, key)
+                end
+                return {result = 1, enchant_attrs = enchant_attrs}
+            else
+                return {result = 3} --not enough dust
+            end
+        else
+            return {result = 2} --not enough gold
+        end
+    else
+        return {result = 4} --equip not exit
+    end
+end
 
+function itemmgr:enchant_apply(itemid, enchant_attrs)
+    if itemmgr:have_item(itemid) then
+        self.items[itemid].enchant_attrs = enchant_attrs
+        return {result = 1}
+    else
+        return {result = 2} --equip not exit
+    end
+end
 
+function itemmgr:refine(itemid)
+    if itemmgr:have_item(itemid) then
+        local need_gold = 1000
+        local item = self.items[itemid]
+        if self.player.basic.gold >= need_gold then
+            if item.enchant_attrs then
+                local attributes = {}
+                item.refine_times = (item.refine_times or 0) + 1
+                for i=1,3 do
+                    local reduce_rate = 1/(1+0.5+1/item.refine_times)
+                    if math.random() < reduce_rate then
+                        attributes[i] = math.random(-10,0)
+                    else
+                        attributes[i] = math.random(1,10)
+                    end
+                    if item.enchant_attrs[i].key == "hp" then
+                        attributes[i] = attributes[i]*10
+                    end
+                end
+                return {result = 1, attributes = attributes}
+            else
+                return {result = 3} --equip have not enchantend
+            end
+        else
+            return {result = 2} --not enough gold
+        end 
+    else
+        return {result = 4} --equip not exit
+    end 
+end
 
-
-
-
-
+function itemmgr:refine_apply(itemid, attributes)
+    if itemmgr:have_item(itemid) then
+        if self.items[itemid].enchant_attrs then
+            for i=1,3 do
+                self.items[itemid].enchant_attrs[i].value = self.items[itemid].enchant_attrs[i].value + attributes[i]
+            end
+            return {result = 1}
+        else
+            return {result = 2} --equip have not enchantend
+        end
+    else
+        return {result = 3} --equip not exit
+    end
+end
 
 return itemmgr

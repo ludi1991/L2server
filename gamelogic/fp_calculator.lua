@@ -86,7 +86,8 @@ function fp_calculator:get_soul_fightpower(player,soulid)
 						if equipData[itemtmp.itemtype].main_attribute == "hp" then value = value*10 end
 					end
 					items[itemtmp.itemid] = {itemid = itemtmp.itemid, itemtype = math.floor(itemtmp.itemtype/100000), item_entity_id = itemtmp.itemtype,
-                           					equiped = true, strengthenLv = level, strengthenValue = value, number = itemtmp.itemcount}
+                           					equiped = true, strengthenLv = level, strengthenValue = value, number = itemtmp.itemcount, gemsid = itemtmp.gem_id,
+                           					enchant_attrs = itemtmp.enchant_attrs}
 				end
 			end
 		end

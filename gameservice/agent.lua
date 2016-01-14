@@ -806,6 +806,21 @@ function REQUEST:set_spell_config()
     return { result = 1}
 end
 
+function REQUEST:enchant_item()
+    return itemmgr:enchant(self.itemid)
+end
+
+function REQUEST:enchant_item_apply()
+    return itemmgr:enchant_apply(self.itemid, self.enchant_attrs)
+end
+
+function REQUEST:refine_item()
+    return itemmgr:refine(self.itemid)
+end
+
+function REQUEST:refine_item_apply()
+    return itemmgr:refine_apply(self.itemid, self.attributes)
+end
 
 function REQUEST:quit()
 	save_to_db()

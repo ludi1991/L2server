@@ -35,21 +35,30 @@ function model_manager:generateCharacter(level, major, itemList, skillList)
     chara.defence  = commonLvFac * majorfacLi.t_defence + chara.strength * 10
     chara.armorpenetration  = commonLvFac * majorfacLi.t_arm + chara.intelligence * 10
 
+    -- log("basic pow------------------------------------"..global_CalculatePower(chara))
+
     --套装加成(套装加成基础属性%)
     local exPer = {0, 0.02, 0.04, 0.06, 0.08, 0.1}
     local equipids = {}
     for i,v in pairs(itemList) do
         table.insert(equipids, v.item_entity_id)
     end
+    -- for i,v in pairs(equipids) do log("equipids----------------------------"..v) end
     local addPer = exPer[global_judgeGrade(equipids)+1]
-    chara.critical = chara.critical*(1+addPer)
-    chara.toughness = chara.toughness*(1+addPer)
-    chara.damage   = chara.damage*(1+addPer)
-    chara.hp       = chara.hp*(1+addPer)
-    chara.hit      = chara.hit*(1+addPer)
-    chara.dodge    = chara.dodge*(1+addPer)
-    chara.defence  = chara.defence*(1+addPer)
-    chara.armorpenetration  = chara.armorpenetration*(1+addPer)
+    -- log("addPer-----------------------------------"..addPer)
+    --只有这里会产生前面8种属性的小数点偏差,要取整
+    chara.critical = math.floor(chara.critical*(1+addPer))
+    chara.toughness = math.floor(chara.toughness*(1+addPer))
+    chara.damage   = math.floor(chara.damage*(1+addPer))
+    chara.hp       = math.floor(chara.hp*(1+addPer))
+    chara.hit      = math.floor(chara.hit*(1+addPer))
+    chara.dodge    = math.floor(chara.dodge*(1+addPer))
+    chara.defence  = math.floor(chara.defence*(1+addPer))
+    chara.armorpenetration  = math.floor(chara.armorpenetration*(1+addPer))
+
+    -- for i,v in pairs(chara) do print(i,v) end
+
+    -- log("add per pow------------------------------------"..global_CalculatePower(chara))
 
     --装备属性
     chara.hp = chara.hp + addtition_attributes.hp
@@ -64,7 +73,8 @@ function model_manager:generateCharacter(level, major, itemList, skillList)
     chara.critouchness = chara.critouchness + addtition_attributes.critouchness
 
     chara.power = global_CalculatePower(chara, skillList)
-
+    -- for i,v in pairs(chara) do print(i,v) end
+    -- log("chara.power------------------------------------"..chara.power)
     return chara
 end
 

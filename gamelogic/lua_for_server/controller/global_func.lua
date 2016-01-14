@@ -28,24 +28,22 @@ function global_CalEquipmentAddtion(itemList)
     if not itemList then return addtition_attributes end
 
     --装备强化,宝石
-    for i=1, #itemList do
-        if itemList[i]~=nil then
-            local equip = global_getEquipStrengthened(itemList[i])
-            if equip ~= nil then
-                addtition_attributes.critical = addtition_attributes.critical + (equip.critical or 0)
-                addtition_attributes.defence =  addtition_attributes.defence+ (equip.defence or 0)
-                addtition_attributes.damage =  addtition_attributes.damage + (equip.damage or 0)
-                addtition_attributes.dodge =  addtition_attributes.dodge + (equip.dodge or 0)
-                addtition_attributes.toughness =  addtition_attributes.toughness + (equip.toughness or 0)
-                addtition_attributes.agility =  addtition_attributes.agility + (equip.agility or 0)
-                addtition_attributes.strength =  addtition_attributes.strength + (equip.strength or 0)
-                addtition_attributes.intelligence =  addtition_attributes.intelligence + (equip.intelligence or 0)
-                addtition_attributes.hp =  addtition_attributes.hp + (equip.hp or 0)
-                addtition_attributes.hit =  addtition_attributes.hit + (equip.agility or 0)
-                addtition_attributes.armorpenetration =  addtition_attributes.armorpenetration + (equip.armorpenetration or 0)
-                addtition_attributes.cridamageadd =  addtition_attributes.cridamageadd + (equip.cridamageadd or 0)
-                addtition_attributes.critouchness =  addtition_attributes.critouchness + (equip.critouchness or 0)
-            end
+    for i,v in pairs(itemList) do
+        local equip = global_getEquipStrengthened(v)
+        if equip ~= nil then
+            addtition_attributes.critical = addtition_attributes.critical + (equip.critical or 0)
+            addtition_attributes.defence =  addtition_attributes.defence+ (equip.defence or 0)
+            addtition_attributes.damage =  addtition_attributes.damage + (equip.damage or 0)
+            addtition_attributes.dodge =  addtition_attributes.dodge + (equip.dodge or 0)
+            addtition_attributes.toughness =  addtition_attributes.toughness + (equip.toughness or 0)
+            addtition_attributes.agility =  addtition_attributes.agility + (equip.agility or 0)
+            addtition_attributes.strength =  addtition_attributes.strength + (equip.strength or 0)
+            addtition_attributes.intelligence =  addtition_attributes.intelligence + (equip.intelligence or 0)
+            addtition_attributes.hp =  addtition_attributes.hp + (equip.hp or 0)
+            addtition_attributes.hit =  addtition_attributes.hit + (equip.hit or 0)
+            addtition_attributes.armorpenetration =  addtition_attributes.armorpenetration + (equip.armorpenetration or 0)
+            addtition_attributes.cridamageadd =  addtition_attributes.cridamageadd + (equip.cridamageadd or 0)
+            addtition_attributes.critouchness =  addtition_attributes.critouchness + (equip.critouchness or 0)
         end
     end
 
@@ -74,16 +72,23 @@ function global_getEquipStrengthened(itemvalue)
         end
     end
 
+    --附魔属性
+    if itemvalue.enchant_attrs then
+        for _,m in pairs(itemvalue.enchant_attrs) do
+            equip[m.key] = (equip[k] or 0) + m.value
+        end
+    end
+
     return equip
 end
 
 --通过装备id，判定套装阶级（可判定敌我）
 function global_judgeGrade(equipids) --TOTAL_EQUIPMENT_POS件
-    if equipids == nil or #equipids ~= TOTAL_EQUIPMENT_POS then return 0 end
+    if equipids == nil or #equipids ~= E_TOTAL_EQUIPMENT_POS then return 0 end
 
     local equipData = require "data.equipdata"
 
-    local min = TOTAL_QUALITY
+    local min = E_TOTAL_QUALITY
     for i,v in pairs(equipids) do
         if v == -1 then return 0 end
         if equipData[v].equip_quality < min then
