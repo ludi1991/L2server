@@ -20,10 +20,15 @@ function friendmgr:get_friend_list()
     return { list = tbl }
 end
 
-function friendmgr:add_friend(playerid)
+function friendmgr:add_friend(friendid)
+    return { result = skynet.call("friend_service","lua",self.basic.playerid,friendid) }
 end
 
 function friendmgr:delete_friend(playerid)
+    return { result = skynet.call("friend_service","lua",self.basic.playerid,friend) }
+end
+
+function friendmgr:get_list()
 end
 
 

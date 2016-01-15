@@ -2,6 +2,8 @@ local skynet = require "skynet"
 require "skynet.manager"	-- import skynet.register
 local player_data = {}
 
+local nickname_hash = {}
+
 local count = 0
 
 local command = {}
@@ -44,7 +46,7 @@ local function gen_robots(count)
 
        -- local factor = 0.8
         robot_data[1000000+i] = npcgen:GenerateNpc(level,factor,1000000+i,namegen:GenerateName(math.random(1,2) == 1))
-
+        --log(robot_data[1000000+i].basic.nickname)
         local count = #robot_data[1000000+i].souls
         robot_data[1000000+i].config.soulid_1v1 = math.random(count)
 
@@ -237,7 +239,8 @@ function command.GET_PLAYER_FIGHT_DATA(playerid,soulid)
 	return { soul = data.souls[soulid],items = items }
 end
 
-
+function command.IS_NICKNAME_EXIST(nickname)
+end
 
 -- list type 1 rank  2 arena
 function command.GET_PLAYER_FIGHTPOWER(playerid,ranktype,listtype)

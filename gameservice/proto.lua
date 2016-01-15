@@ -634,6 +634,7 @@ get_unlock_soul 52 {
 get_friend_list 53 {
     response {
         list 0 : *player_basic(playerid)
+        is_online 1 : boolean
     }
 }
 

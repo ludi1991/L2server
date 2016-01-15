@@ -20,6 +20,7 @@ skynet.start(function()
 	skynet.newservice("arena_service")
 	skynet.newservice("update_service")
 	skynet.newservice("activation_service")
+	skynet.newservice("friend_service")
 
 
 	local watchdog = skynet.newservice("watchdog")

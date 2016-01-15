@@ -485,8 +485,12 @@ end
 local function robot_register()
 	for i,v in pairs(ROBOT_IDS) do
 		command.REGISTER(v)
-		command.UNLOCK_HOURGLASS(v,2)
-		command.UNLOCK_HOURGLASS(v,3)
+        if v-1000000 < 500 then
+		    command.UNLOCK_HOURGLASS(v,2)
+        end
+        if v-1000000 < 200 then
+		    command.UNLOCK_HOURGLASS(v,3)
+        end
 	end
 end
 
@@ -507,6 +511,7 @@ local function robot_work()
                             sandtype = 3
                         end
         				command.START_HOURGLASS(hg.playerid,hg.glassid,sandtype)
+                       -- open_count = open_count + 1
                        -- log("SUCCESS!robotid "..robotid.. "put "..sandtype.. "into glass "..hg.glassid)
                     else
                        -- log("FAILED!robotid "..robotid.. "put ".. "into glass "..hg.glassid)
